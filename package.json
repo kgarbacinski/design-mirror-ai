@@ -1,0 +1,30 @@
+{
+  "name": "design-mirror",
+  "version": "1.0.0",
+  "description": "Chrome extension to analyze design systems and generate AI-ready prompts",
+  "scripts": {
+    "dev": "webpack --mode development --watch",
+    "build": "webpack --mode production",
+    "type-check": "tsc --noEmit",
+    "package": "npm run build && cd build && zip -r ../design-mirror.zip ."
+  },
+  "keywords": ["chrome-extension", "design-system", "ai", "css", "analysis"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.260",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "copy-webpack-plugin": "^11.0.0",
+    "css-loader": "^6.8.0",
+    "style-loader": "^3.3.0",
+    "ts-loader": "^9.5.0",
+    "typescript": "^5.2.0",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.0"
+  }
+}

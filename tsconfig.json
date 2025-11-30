@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "lib": ["ES2020", "DOM"],
+    "jsx": "react",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "sourceMap": true,
+    "outDir": "./build",
+    "baseUrl": "./",
+    "paths": {
+      "@shared/*": ["./shared/*"],
+      "@content/*": ["./content/*"],
+      "@popup/*": ["./popup/*"]
+    }
+  },
+  "include": [
+    "content/**/*",
+    "popup/**/*",
+    "background/**/*",
+    "shared/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "build"
+  ]
+}
