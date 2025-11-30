@@ -2,14 +2,13 @@ import React from 'react';
 import type { AnalysisResult } from '@shared/types/design-system.types';
 
 interface AnalysisResultsProps {
-  data: {
-    result: AnalysisResult;
+  data: AnalysisResult & {
     prompt: any;
   };
 }
 
 const AnalysisResults: React.FC<AnalysisResultsProps> = ({ data }) => {
-  const { result } = data;
+  const result = data;
 
   return (
     <div className="results-container">

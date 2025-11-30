@@ -9,8 +9,7 @@ import CopyButtons from './components/CopyButtons';
 
 type AppState = 'idle' | 'analyzing' | 'complete' | 'error';
 
-interface AnalysisData {
-  result: AnalysisResult;
+interface AnalysisData extends AnalysisResult {
   prompt: any;
 }
 

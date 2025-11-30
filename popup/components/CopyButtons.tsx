@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import type { AnalysisResult } from '@shared/types/design-system.types';
 
 interface CopyButtonsProps {
-  data: {
-    result: AnalysisResult;
+  data: AnalysisResult & {
     prompt: any;
   };
 }
@@ -24,7 +23,9 @@ const CopyButtons: React.FC<CopyButtonsProps> = ({ data }) => {
 
   const handleCopyJSON = async () => {
     try {
-      const json = JSON.stringify(data.result, null, 2);
+      // Don't include prompt in JSON export
+      const { prompt, ...result } = data;
+      const json = JSON.stringify(result, null, 2);
       await navigator.clipboard.writeText(json);
       setCopiedJSON(true);
       setTimeout(() => setCopiedJSON(false), 2000);
@@ -34,7 +35,9 @@ const CopyButtons: React.FC<CopyButtonsProps> = ({ data }) => {
   };
 
   const handleDownloadJSON = () => {
-    const json = JSON.stringify(data.result, null, 2);
+    // Don't include prompt in JSON export
+    const { prompt, ...result } = data;
+    const json = JSON.stringify(result, null, 2);
     const blob = new Blob([json], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
