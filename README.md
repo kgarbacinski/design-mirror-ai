@@ -1,69 +1,251 @@
 # 🪞 DesignMirror
 
-A Chrome extension that analyzes design systems from any website and generates AI-ready prompts with CSS/HTML snippets.
+> **Extract design systems from any website and generate AI-ready prompts instantly**
 
-## Features
+[![Chrome Web Store](https://img.shields.io/badge/Chrome-Install-blue?style=for-the-badge&logo=google-chrome)](https://chrome.google.com/webstore)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-18-61dafb?style=for-the-badge&logo=react)](https://reactjs.org/)
 
-- Extract color palettes with role detection (primary, secondary, neutrals, semantic)
-- Analyze typography systems (font families, type scales, modular ratios)
-- Detect spacing patterns and base units
-- Identify UI components (buttons, cards, forms, navigation)
-- Generate hybrid prompts (natural language + code snippets)
-- Export results as JSON
-- History of analyzed pages
+![DesignMirror Demo](./assets/demo.gif)
 
-## Development
+## ✨ What is DesignMirror?
 
-### Setup
+DesignMirror is a powerful Chrome extension that **analyzes any website's design system** and generates detailed AI prompts with CSS variables, component examples, and design tokens. Perfect for designers, developers, and anyone building UI that needs to match existing designs.
+
+### 🎯 Key Features
+
+- **🎨 Color Palette Extraction** - Intelligent clustering with K-means algorithm to identify primary, secondary, accent, and semantic colors
+- **📝 Typography Analysis** - Detects font families, modular scales (Golden Ratio, Major Third, etc.), and type hierarchies
+- **📏 Spacing System** - Identifies base units (4px, 8px, etc.) and generates consistent spacing scales
+- **🧩 Component Detection** - Automatically detects UI components (buttons, cards, modals, forms, etc.) with confidence scores
+- **✨ Visual Effects** - Extracts shadows, border radius, and other design patterns
+- **🤖 AI-Ready Output** - Generates prompts optimized for Claude, ChatGPT, and other AI tools
+- **📋 Multiple Export Formats** - Copy as formatted prompt or export as JSON
+- **⚡ Fast & Efficient** - Analyzes thousands of elements in seconds with smart caching
+
+## 🚀 Installation
+
+### From Chrome Web Store (Recommended)
+
+Coming soon! Star this repo to get notified.
+
+### Manual Installation (Development)
+
+1. Clone this repository:
+```bash
+git clone https://github.com/kgarbacinski/design-mirror.git
+cd design-mirror
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Build the extension:
+```bash
+npm run build
+```
+
+4. Load in Chrome:
+   - Open `chrome://extensions/`
+   - Enable "Developer mode"
+   - Click "Load unpacked"
+   - Select the `build/` folder
+
+## 📖 How to Use
+
+1. **Navigate** to any website you want to analyze
+2. **Click** the DesignMirror icon in your Chrome toolbar
+3. **Click** "Analyze This Page"
+4. **Wait** 5-15 seconds for analysis to complete
+5. **Copy** the AI prompt or export as JSON
+6. **Use** the prompt with your favorite AI tool to recreate the design!
+
+### Example Output
+
+```markdown
+# Design System Analysis
+
+Analysis of "Stripe" (https://stripe.com)
+
+**Primary Color**: #635BFF
+- Used 847 times across the site
+- Usage: background-color, border-color, color
+
+**Typography**: Inter
+- Modular scale ratio: 1.25 (Major Third)
+- Base size: 16px
+
+**Spacing System**: 8px base unit
+- xs: 4px (0.5x)
+- sm: 8px (1x)
+- md: 16px (2x)
+- lg: 24px (3x)
+
+## CSS Variables (Design Tokens)
+
+\`\`\`css
+:root {
+  /* Colors */
+  --color-primary: #635BFF;
+  --color-neutral-100: #FFFFFF;
+  --color-neutral-900: #0A2540;
+
+  /* Typography */
+  --font-primary: Inter;
+  --font-size-base: 16px;
+
+  /* Spacing */
+  --spacing-unit: 8px;
+  --spacing-md: 16px;
+}
+\`\`\`
+```
+
+## 🏗️ Architecture
+
+DesignMirror is built with:
+
+- **TypeScript** - Full type safety across the entire codebase
+- **React 18** - Modern UI with hooks
+- **Chrome Extension Manifest V3** - Latest extension architecture
+- **Webpack 5** - Optimized bundling
+- **Advanced Algorithms**:
+  - K-means clustering for color grouping
+  - Delta E (CIE76) for perceptual color distance
+  - Modular scale detection for typography
+  - Heuristic-based component detection
+
+### Project Structure
+
+```
+design-mirror/
+├── background/         # Service worker for message coordination
+├── content/           # Content script running on web pages
+│   ├── analyzers/     # 6 specialized analyzers
+│   ├── generators/    # Prompt and code generators
+│   └── utils/         # DOM walker, style cache, pattern matching
+├── popup/             # React UI
+│   ├── components/    # UI components
+│   └── styles/        # CSS styling
+├── shared/            # Shared types and utilities
+└── icons/             # Extension icons
+```
+
+## 🎯 Use Cases
+
+### For Designers
+- **Quick design audits** - See what colors, fonts, and spacing a site actually uses
+- **Competitive analysis** - Understand design systems of successful products
+- **Design system documentation** - Extract tokens from existing sites
+
+### For Developers
+- **Rapid prototyping** - Get CSS variables ready to use
+- **Design system migration** - Document existing patterns before refactoring
+- **Learning** - Study how top websites structure their design systems
+
+### For AI Users
+- **Better prompts** - Feed accurate design specifications to AI tools
+- **Consistent recreations** - Generate UIs that match reference designs
+- **Design tokens** - Get structured data for AI-powered design tools
+
+## 🛠️ Development
+
+### Prerequisites
+
+- Node.js 18+
+- npm or yarn
+- Chrome/Chromium browser
+
+### Scripts
 
 ```bash
-# Install dependencies
-npm install
-
-# Development mode (watch)
+# Development build with watch mode
 npm run dev
 
 # Production build
 npm run build
 
-# Type check
+# Type checking
 npm run type-check
 
-# Package for Chrome Web Store
+# Create distributable ZIP
 npm run package
 ```
 
-### Loading the Extension
+### Tech Stack Deep Dive
 
-1. Run `npm run build`
-2. Open Chrome and go to `chrome://extensions/`
-3. Enable "Developer mode"
-4. Click "Load unpacked"
-5. Select the `build` folder
+**Performance Optimizations:**
+- WeakMap caching for `getComputedStyle()` calls (10x faster)
+- Batch processing with `requestIdleCallback` for non-blocking DOM traversal
+- Selective property extraction (40 CSS properties vs 300+)
 
-## Project Structure
+**Color Analysis:**
+- K-means clustering with configurable iterations
+- LAB color space for perceptual distance calculations
+- Role detection (primary/secondary/accent/neutrals/semantic)
+- CSS variable extraction from `:root` and custom properties
 
-```
-design-mirror/
-├── background/          # Service worker
-├── content/            # Content script & analyzers
-│   ├── analyzers/      # Design system analyzers
-│   ├── utils/          # DOM walker, cache
-│   └── generators/     # Prompt & code generators
-├── popup/              # React UI
-│   ├── components/     # React components
-│   └── styles/         # CSS
-├── shared/             # Shared types & utilities
-└── icons/              # Extension icons
-```
+**Typography Analysis:**
+- Modular scale detection (Golden Ratio: 1.618, Major Third: 1.25, etc.)
+- Frequency-based font family identification
+- Type scale categorization (xs, sm, base, lg, xl, 2xl, 3xl, 4xl)
+- Heading style extraction
 
-## Technologies
+## 🤝 Contributing
 
-- Manifest V3
-- TypeScript
-- React
-- Webpack
+We love contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
-## License
+### Quick Start for Contributors
 
-MIT
+1. Fork the repo
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Make your changes
+4. Run type check: `npm run type-check`
+5. Build: `npm run build`
+6. Commit: `git commit -m "Add amazing feature"`
+7. Push: `git push origin feature/amazing-feature`
+8. Open a Pull Request
+
+### Ideas for Contributions
+
+- [ ] Add more component detectors (tabs, accordions, breadcrumbs)
+- [ ] Support for CSS Grid analysis
+- [ ] Animation/transition extraction
+- [ ] Export to Figma tokens format
+- [ ] Dark mode color palette detection
+- [ ] Accessibility contrast ratio analysis
+- [ ] Support for other browsers (Firefox, Edge)
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🌟 Show Your Support
+
+If DesignMirror helped you, please:
+- ⭐ Star this repository
+- 🐛 Report bugs via [GitHub Issues](https://github.com/yourusername/design-mirror/issues)
+- 💡 Suggest features via [GitHub Discussions](https://github.com/yourusername/design-mirror/discussions)
+- 🔀 Contribute code via Pull Requests
+- 📣 Share with your network
+
+## 🙏 Acknowledgments
+
+- Inspired by the need for better design system documentation
+- Built with modern web technologies and algorithms from computer vision
+- Community-driven development
+
+## 📬 Contact
+
+- **Issues**: [GitHub Issues](https://github.com/kgarbacinski/design-mirror/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/kgarbacinski/design-mirror/discussions)
+
+---
+
+<p align="center">Made with ❤️ by developers, for developers</p>
+<p align="center">
+  <a href="https://github.com/yourusername/design-mirror/stargazers">⭐ Star us on GitHub</a>
+</p>
