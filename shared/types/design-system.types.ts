@@ -213,6 +213,153 @@ export interface ComponentPattern {
   heuristics: Heuristic[];
 }
 
+// ===== Interactive Pattern System =====
+
+export type ThemeSwitcherMechanism =
+  | 'class-toggle'
+  | 'attribute-toggle'
+  | 'css-var-swap'
+  | 'stylesheet-swap';
+
+export interface ThemeSwitcherPattern {
+  mechanism: ThemeSwitcherMechanism;
+  themes: string[]; // e.g., ['light', 'dark']
+  toggleElement: string | null; // selector or description
+  cssVariables: Array<{
+    name: string;
+    values: Record<string, string>; // theme name -> value
+  }>;
+  storageKey: string | null;
+  implementation: string; // code snippet or description
+}
+
+export interface CSSTransitionPattern {
+  property: string;
+  duration: string;
+  timingFunction: string;
+  delay?: string;
+  count: number;
+  examples: string[]; // selectors where this transition is used
+}
+
+export interface KeyframeAnimation {
+  name: string;
+  duration: string;
+  timingFunction: string;
+  iterationCount: string;
+  keyframes: string; // @keyframes rule as string
+  usedBy: string[]; // selectors using this animation
+}
+
+export interface CSSAnimationPattern {
+  transitions: CSSTransitionPattern[];
+  keyframeAnimations: KeyframeAnimation[];
+  animatedProperties: string[]; // all properties being animated
+}
+
+export type TransformType = '2d' | '3d';
+
+export interface TransformPattern {
+  type: TransformType;
+  functions: Array<{
+    name: string; // 'translate', 'rotate', 'scale', etc.
+    count: number;
+    examples: Array<{
+      selector: string;
+      value: string;
+    }>;
+  }>;
+  perspective: Array<{
+    value: string;
+    count: number;
+  }>;
+}
+
+export interface InteractiveStatePattern {
+  selector: string;
+  states: {
+    hover?: Record<string, string>; // CSS property -> value
+    focus?: Record<string, string>;
+    active?: Record<string, string>;
+    disabled?: Record<string, string>;
+  };
+  changedProperties: string[]; // properties that change on interaction
+  context?: {
+    elementType?: string; // 'button', 'link', 'card', etc.
+    role?: string; // ARIA role or inferred purpose
+    textContent?: string; // First few words of text content
+    baseStyles?: Record<string, string>; // Base (non-hover) styles for comparison
+  };
+}
+
+export type JSAnimationLibrary =
+  | 'gsap'
+  | 'anime'
+  | 'framer-motion'
+  | 'lottie'
+  | 'three'
+  | 'unknown';
+
+export interface JSAnimationPattern {
+  librariesDetected: Array<{
+    name: JSAnimationLibrary;
+    confidence: number;
+  }>;
+  styleChanges: Array<{
+    element: string; // selector or description
+    properties: string[]; // CSS properties changed via JS
+    frequency: 'continuous' | 'on-interaction' | 'on-load';
+  }>;
+  eventListeners: Array<{
+    event: string; // 'click', 'scroll', etc.
+    count: number;
+  }>;
+  animatedElements: number;
+  hasComplexAnimations: boolean;
+}
+
+// ===== Behavioral Pattern System (NEW) =====
+
+export interface ModeSwitcherPattern {
+  type: 'mode-switcher';
+  toggleElement: string; // Description of the button/control
+  location: string; // Where it's located (navigation, etc.)
+  inferredModes: string[]; // Possible modes (e.g., ['developer', 'founder'])
+  currentMode: string; // Currently active mode
+  evidence: string[]; // Evidence used to detect this pattern
+  confidence: 'high' | 'medium' | 'low';
+}
+
+export interface ToggleButtonPattern {
+  type: 'toggle-button';
+  element: string; // Element description
+  text: string; // Button text
+  ariaExpanded: boolean | null; // Current expanded state
+  location: string; // Context
+}
+
+export interface TabGroupPattern {
+  type: 'tab-group';
+  tabs: string[]; // Tab labels
+  activeTab: string; // Currently active tab
+  location: string; // Where this tab group is
+}
+
+export interface BehavioralPattern {
+  modeSwitchers: ModeSwitcherPattern[];
+  toggleButtons: ToggleButtonPattern[];
+  tabGroups: TabGroupPattern[];
+}
+
+export interface InteractionPatternSystem {
+  themeSwitchers: ThemeSwitcherPattern[];
+  cssAnimations: CSSAnimationPattern;
+  transforms: TransformPattern;
+  interactiveStates: InteractiveStatePattern[];
+  jsAnimations: JSAnimationPattern;
+  behavioral: BehavioralPattern; // NEW!
+}
+
 // ===== Complete Analysis Result =====
 
 export interface AnalysisResult {
@@ -226,6 +373,7 @@ export interface AnalysisResult {
   shadows: ShadowSystem;
   borders: BorderSystem;
   components: DetectedComponent[];
+  interactions: InteractionPatternSystem;
 }
 
 // ===== Generated Output =====
@@ -249,6 +397,7 @@ export interface PromptDescription {
     typography: string;
     spacing: string;
     components: string;
+    interactions: string;
   };
   patterns: string[];
 }
