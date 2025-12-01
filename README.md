@@ -24,6 +24,15 @@ DesignMirror is a powerful Chrome extension that **analyzes any website's design
 - **📋 Multiple Export Formats** - Copy as formatted prompt or export as JSON
 - **⚡ Fast & Efficient** - Analyzes thousands of elements in seconds with smart caching
 
+## 🎯 Proof It Works
+<p align="center">
+  <img src="docs/assets/stripe-comparison-hero.png" alt="Stripe Recreation Example" width="800"/>
+</p>
+
+<p align="center">
+  <b>From Stripe.com analysis to pixel-perfect replica in under 2 minutes</b>
+</p>
+
 ## 🚀 Installation
 
 ### From Chrome Web Store (Recommended)

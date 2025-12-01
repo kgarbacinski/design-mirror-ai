@@ -27,3 +27,5 @@ npm-debug.log*
 # Environment
 .env
 .env.local
+
+LAUNCH_GUIDE.md
