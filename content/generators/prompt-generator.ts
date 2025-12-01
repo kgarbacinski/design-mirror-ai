@@ -11,7 +11,8 @@ import type {
   ColorPalette,
   TypographySystem,
   SpacingSystem,
-  DetectedComponent
+  DetectedComponent,
+  InteractionPatternSystem
 } from '@shared/types/design-system.types';
 
 export class PromptGenerator {
@@ -25,7 +26,8 @@ export class PromptGenerator {
         colors: this.describeColors(analysis.colors),
         typography: this.describeTypography(analysis.typography),
         spacing: this.describeSpacing(analysis.spacing),
-        components: this.describeComponents(analysis.components)
+        components: this.describeComponents(analysis.components),
+        interactions: this.describeInteractions(analysis.interactions)
       },
       patterns: this.identifyPatterns(analysis)
     };
@@ -230,6 +232,192 @@ export class PromptGenerator {
   }
 
   /**
+   * Describe interactive patterns
+   */
+  private describeInteractions(interactions: InteractionPatternSystem): string {
+    let desc = `## Interactive Patterns\n\n`;
+
+    // Theme Switchers
+    if (interactions.themeSwitchers.length > 0) {
+      desc += `**Theme Switching**:\n`;
+      for (const theme of interactions.themeSwitchers) {
+        desc += `- Mechanism: \`${theme.mechanism}\`\n`;
+        desc += `  - Themes: ${theme.themes.join(', ')}\n`;
+        if (theme.toggleElement) {
+          desc += `  - Toggle: ${theme.toggleElement}\n`;
+        }
+        if (theme.cssVariables.length > 0) {
+          desc += `  - CSS Variables: ${theme.cssVariables.length} theme-aware variables\n`;
+        }
+        if (theme.storageKey) {
+          desc += `  - Persisted in localStorage: \`${theme.storageKey}\`\n`;
+        }
+      }
+      desc += `\n`;
+    }
+
+    // CSS Animations
+    const { cssAnimations } = interactions;
+    if (cssAnimations.transitions.length > 0) {
+      desc += `**CSS Transitions** (${cssAnimations.transitions.length} patterns):\n`;
+      const topTransitions = cssAnimations.transitions.slice(0, 5);
+      for (const t of topTransitions) {
+        desc += `- \`${t.property}\`: ${t.duration} ${t.timingFunction} (used ${t.count}×)\n`;
+      }
+      desc += `\n`;
+    }
+
+    if (cssAnimations.keyframeAnimations.length > 0) {
+      desc += `**Keyframe Animations** (${cssAnimations.keyframeAnimations.length} animations):\n`;
+      for (const anim of cssAnimations.keyframeAnimations.slice(0, 3)) {
+        desc += `- \`@keyframes ${anim.name}\``;
+        if (anim.usedBy.length > 0) {
+          desc += ` - Used by: ${anim.usedBy.slice(0, 2).join(', ')}`;
+        }
+        desc += `\n`;
+      }
+      desc += `\n`;
+    }
+
+    // Transforms
+    if (interactions.transforms.functions.length > 0) {
+      desc += `**Transform Effects** (${interactions.transforms.type}):\n`;
+      const topTransforms = interactions.transforms.functions.slice(0, 5);
+      for (const func of topTransforms) {
+        desc += `- \`${func.name}()\`: used ${func.count}× (e.g., ${func.examples[0]?.value || ''})\n`;
+      }
+      desc += `\n`;
+    }
+
+    // Interactive States
+    if (interactions.interactiveStates.length > 0) {
+      desc += `**Interactive States** (${interactions.interactiveStates.length} selectors):\n\n`;
+      const topStates = interactions.interactiveStates.slice(0, 5);
+      for (const state of topStates) {
+        const stateNames = Object.keys(state.states);
+
+        // Show context if available
+        if (state.context) {
+          const ctx = state.context;
+          desc += `**${ctx.elementType || 'Element'}** (\`${state.selector}\`)`;
+
+          if (ctx.textContent) {
+            desc += ` - "${ctx.textContent}"`;
+          }
+          if (ctx.role) {
+            desc += ` [${ctx.role}]`;
+          }
+          desc += `\n`;
+
+          // Show base styles
+          if (ctx.baseStyles) {
+            desc += `  Base: `;
+            const baseProps = Object.entries(ctx.baseStyles)
+              .filter(([_, val]) => val && val !== 'none' && val !== 'rgba(0, 0, 0, 0)')
+              .slice(0, 2)
+              .map(([prop, val]) => `${prop}: ${val}`)
+              .join('; ');
+            if (baseProps) desc += `${baseProps}\n`;
+          }
+        } else {
+          desc += `\`${state.selector}\`:\n`;
+        }
+
+        // Show specific state changes
+        stateNames.forEach(stateName => {
+          const stateStyles = state.states[stateName as keyof typeof state.states];
+          if (stateStyles && Object.keys(stateStyles).length > 0) {
+            const changes = Object.entries(stateStyles)
+              .slice(0, 3)
+              .map(([prop, val]) => `${prop}: ${val}`)
+              .join('; ');
+            desc += `  - :${stateName} → ${changes}\n`;
+          }
+        });
+        desc += `\n`;
+      }
+    }
+
+    // JavaScript Animations
+    if (interactions.jsAnimations.librariesDetected.length > 0) {
+      desc += `**JavaScript Animation Libraries**:\n`;
+      for (const lib of interactions.jsAnimations.librariesDetected) {
+        desc += `- ${lib.name} (confidence: ${(lib.confidence * 100).toFixed(0)}%)\n`;
+      }
+      desc += `\n`;
+    }
+
+    if (interactions.jsAnimations.styleChanges.length > 0) {
+      desc += `**JS-Driven Animations**:\n`;
+      desc += `- ${interactions.jsAnimations.animatedElements} elements with dynamic styles\n`;
+      desc += `- Animation frequency: ${interactions.jsAnimations.styleChanges[0]?.frequency || 'varied'}\n\n`;
+    }
+
+    // Behavioral Patterns (NEW!)
+    const { behavioral } = interactions;
+
+    // Mode Switchers
+    if (behavioral.modeSwitchers.length > 0) {
+      desc += `## 🎯 Behavioral Patterns\n\n`;
+      desc += `**Mode Switchers** (${behavioral.modeSwitchers.length} detected):\n\n`;
+
+      for (const switcher of behavioral.modeSwitchers) {
+        desc += `**${switcher.toggleElement}**\n`;
+        desc += `- Location: ${switcher.location}\n`;
+        desc += `- Modes: ${switcher.inferredModes.join(' ↔ ')}\n`;
+        desc += `- Current: ${switcher.currentMode}\n`;
+        desc += `- Confidence: ${switcher.confidence}\n`;
+
+        if (switcher.evidence.length > 0) {
+          desc += `- Evidence:\n`;
+          switcher.evidence.forEach(e => {
+            desc += `  - ${e}\n`;
+          });
+        }
+
+        desc += `\n`;
+      }
+    }
+
+    // Toggle Buttons
+    if (behavioral.toggleButtons.length > 0) {
+      if (behavioral.modeSwitchers.length === 0) {
+        desc += `## 🎯 Behavioral Patterns\n\n`;
+      }
+      desc += `**Toggle Buttons** (${behavioral.toggleButtons.length} detected):\n`;
+
+      for (const toggle of behavioral.toggleButtons.slice(0, 5)) {
+        desc += `- ${toggle.element}`;
+        if (toggle.text) {
+          desc += ` - "${toggle.text}"`;
+        }
+        desc += ` (${toggle.location})`;
+        if (toggle.ariaExpanded !== null) {
+          desc += ` [${toggle.ariaExpanded ? 'expanded' : 'collapsed'}]`;
+        }
+        desc += `\n`;
+      }
+      desc += `\n`;
+    }
+
+    // Tab Groups
+    if (behavioral.tabGroups.length > 0) {
+      if (behavioral.modeSwitchers.length === 0 && behavioral.toggleButtons.length === 0) {
+        desc += `## 🎯 Behavioral Patterns\n\n`;
+      }
+      desc += `**Tab Groups** (${behavioral.tabGroups.length} detected):\n`;
+
+      for (const tabGroup of behavioral.tabGroups) {
+        desc += `- ${tabGroup.location}: [${tabGroup.tabs.join(', ')}]\n`;
+        desc += `  Active: "${tabGroup.activeTab}"\n`;
+      }
+      desc += `\n`;
+    }
+
+    return desc;
+  }
+
+  /**
    * Identify design patterns
    */
   private identifyPatterns(analysis: AnalysisResult): string[] {
@@ -266,6 +454,28 @@ export class PromptGenerator {
     const hasVariations = analysis.components.some(c => c.variations.length > 0);
     if (hasVariations) {
       patterns.push(`Components use size/variant variations (sm, md, lg, primary, secondary)`);
+    }
+
+    // Check for interactive patterns
+    if (analysis.interactions.themeSwitchers.length > 0) {
+      patterns.push(
+        `Implements theme switching (${analysis.interactions.themeSwitchers[0].mechanism})`
+      );
+    }
+
+    if (analysis.interactions.cssAnimations.transitions.length > 5) {
+      patterns.push(
+        `Heavy use of CSS transitions for smooth interactions (${analysis.interactions.cssAnimations.transitions.length} patterns)`
+      );
+    }
+
+    if (analysis.interactions.transforms.type === '3d') {
+      patterns.push(`Uses 3D transforms for advanced visual effects`);
+    }
+
+    if (analysis.interactions.jsAnimations.librariesDetected.length > 0) {
+      const libs = analysis.interactions.jsAnimations.librariesDetected.map(l => l.name).join(', ');
+      patterns.push(`Uses animation libraries: ${libs}`);
     }
 
     return patterns;
