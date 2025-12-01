@@ -124,6 +124,15 @@ export class CodeGenerator {
       });
     }
 
+    // Transitions & Animations
+    if (analysis.interactions.cssAnimations.transitions.length > 0) {
+      css += `\n  /* ===== Transitions ===== */\n`;
+      const topTransitions = analysis.interactions.cssAnimations.transitions.slice(0, 3);
+      topTransitions.forEach((t, i) => {
+        css += `  --transition-${i + 1}: ${t.property} ${t.duration} ${t.timingFunction};\n`;
+      });
+    }
+
     css += `}\n`;
 
     return css;

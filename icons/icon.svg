@@ -1,10 +1,33 @@
-<svg width="128" height="128" xmlns="http://www.w3.org/2000/svg">
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Gradient background -->
   <defs>
     <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
       <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
     </linearGradient>
   </defs>
+
+  <!-- Background rounded square -->
   <rect width="128" height="128" rx="24" fill="url(#grad)"/>
-  <text x="64" y="88" font-size="72" text-anchor="middle" fill="white">🪞</text>
+
+  <!-- Mirror frame -->
+  <ellipse cx="64" cy="60" rx="35" ry="42" fill="none" stroke="white" stroke-width="5"/>
+
+  <!-- Mirror shine/reflection -->
+  <ellipse cx="64" cy="60" rx="30" ry="37" fill="white" opacity="0.12"/>
+
+  <!-- Design elements inside mirror -->
+  <!-- Color palette circles -->
+  <circle cx="52" cy="52" r="5" fill="white" opacity="0.85"/>
+  <circle cx="64" cy="52" r="5" fill="white" opacity="0.65"/>
+  <circle cx="76" cy="52" r="5" fill="white" opacity="0.85"/>
+
+  <!-- Typography lines -->
+  <rect x="50" y="62" width="28" height="2.5" rx="1.25" fill="white" opacity="0.85"/>
+  <rect x="50" y="67" width="20" height="2" rx="1" fill="white" opacity="0.65"/>
+  <rect x="50" y="71" width="24" height="2" rx="1" fill="white" opacity="0.65"/>
+
+  <!-- Mirror handle -->
+  <rect x="59" y="100" width="10" height="18" rx="2" fill="white" opacity="0.85"/>
+  <ellipse cx="64" cy="100" rx="8" ry="3" fill="white" opacity="0.6"/>
 </svg>

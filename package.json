@@ -1,15 +1,38 @@
 {
   "name": "design-mirror",
   "version": "1.0.0",
-  "description": "Chrome extension to analyze design systems and generate AI-ready prompts",
+  "description": "Chrome extension to analyze design systems and generate AI-ready prompts with CSS variables, component examples, and design tokens",
+  "main": "build/popup/popup.js",
   "scripts": {
     "dev": "webpack --mode development --watch",
     "build": "webpack --mode production",
     "type-check": "tsc --noEmit",
-    "package": "npm run build && cd build && zip -r ../design-mirror.zip ."
+    "package": "npm run build && cd build && zip -r ../design-mirror-v$(node -p \"require('./package.json').version\").zip .",
+    "clean": "rm -rf build dist *.zip"
   },
-  "keywords": ["chrome-extension", "design-system", "ai", "css", "analysis"],
-  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kgarbacinski/design-mirror.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kgarbacinski/design-mirror/issues"
+  },
+  "homepage": "https://github.com/kgarbacinski/design-mirror#readme",
+  "keywords": [
+    "chrome-extension",
+    "design-system",
+    "design-tokens",
+    "css-variables",
+    "ai-prompts",
+    "ui-analysis",
+    "color-palette",
+    "typography",
+    "spacing-system",
+    "component-detection",
+    "web-scraping",
+    "frontend-tools"
+  ],
+  "author": "Your Name <your.email@example.com>",
   "license": "MIT",
   "dependencies": {
     "react": "^18.2.0",

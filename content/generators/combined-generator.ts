@@ -52,6 +52,8 @@ export class CombinedGenerator {
     prompt += description.designSystem.spacing;
     prompt += `\n`;
     prompt += description.designSystem.components;
+    prompt += `\n`;
+    prompt += description.designSystem.interactions;
 
     // Patterns
     if (description.patterns.length > 0) {
@@ -85,6 +87,55 @@ export class CombinedGenerator {
       prompt += `## Utility Classes\n\n`;
       prompt += `Optional utility classes based on the spacing and typography system:\n\n`;
       prompt += `\`\`\`css\n${code.utilities}\`\`\`\n\n`;
+    }
+
+    // Practical Animation Examples
+    if (analysis.interactions.interactiveStates.length > 0 ||
+        analysis.interactions.cssAnimations.transitions.length > 0) {
+      prompt += `## 🎨 Practical Animation Examples\n\n`;
+      prompt += `Ready-to-use CSS code for recreating the interactive effects:\n\n`;
+
+      // Hover effects
+      if (analysis.interactions.interactiveStates.length > 0) {
+        const topState = analysis.interactions.interactiveStates[0];
+        const hoverStyles = topState.states.hover;
+
+        if (hoverStyles) {
+          prompt += `### Hover Effect Example\n\n`;
+          prompt += `\`\`\`css\n`;
+          prompt += `/* Based on ${topState.selector} */\n`;
+          prompt += `.interactive-element {\n`;
+
+          // Add transitions if available
+          const transition = analysis.interactions.cssAnimations.transitions[0];
+          if (transition) {
+            prompt += `  transition: ${transition.property} ${transition.duration} ${transition.timingFunction};\n`;
+          }
+
+          prompt += `}\n\n`;
+          prompt += `.interactive-element:hover {\n`;
+
+          Object.entries(hoverStyles).slice(0, 4).forEach(([prop, val]) => {
+            prompt += `  ${prop}: ${val};\n`;
+          });
+
+          prompt += `}\n`;
+          prompt += `\`\`\`\n\n`;
+        }
+      }
+
+      // Keyframe animation example
+      if (analysis.interactions.cssAnimations.keyframeAnimations.length > 0) {
+        const anim = analysis.interactions.cssAnimations.keyframeAnimations[0];
+        prompt += `### Animation Example\n\n`;
+        prompt += `\`\`\`css\n`;
+        prompt += `/* ${anim.name} animation */\n`;
+        prompt += `.animated-element {\n`;
+        prompt += `  animation: ${anim.name} ${anim.duration || '1s'} ${anim.timingFunction || 'ease'} ${anim.iterationCount || 'infinite'};\n`;
+        prompt += `}\n\n`;
+        prompt += `/* Copy the @keyframes from the site's CSS */\n`;
+        prompt += `\`\`\`\n\n`;
+      }
     }
 
     // Footer
