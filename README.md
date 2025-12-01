@@ -84,7 +84,7 @@ No more guessing hex codes, eyeballing spacing, or reverse-engineering that smoo
 <p align="center">
   <b>⭐ If DesignMirror saves you time, consider starring this repo!</b>
   <br/><br/>
-  <a href="https://github.com/kgarbacinski/design-mirror/stargazers">
+  <a href="https://github.com/kgarbacinski/design-mirror-ai/stargazers">
     <img src="https://img.shields.io/github/stars/kgarbacinski/design-mirror?style=social" alt="GitHub stars"/>
   </a>
 </p>
@@ -101,7 +101,7 @@ Coming soon! Star this repo to get notified.
 
 1. Clone this repository:
 ```bash
-git clone https://github.com/kgarbacinski/design-mirror.git
+git clone https://github.com/kgarbacinski/design-mirror-ai.git
 cd design-mirror
 ```
 
@@ -151,6 +151,27 @@ Analysis of "Stripe" (https://stripe.com)
 - md: 16px (2x)
 - lg: 24px (3x)
 
+## Animations & Transitions
+
+**Button Hover Transition**:
+- Property: transform, box-shadow
+- Duration: 0.2s
+- Timing: cubic-bezier(0.4, 0, 0.2, 1)
+
+**Card Hover Effect**:
+- transform: translateY(-4px)
+- box-shadow: 0 12px 24px rgba(0,0,0,0.1)
+
+## Interactive States
+
+**.btn-primary:hover**
+- background-color: #5851e6
+- transform: translateY(-1px)
+- box-shadow: 0 4px 12px rgba(99, 91, 255, 0.4)
+
+**.btn-primary:active**
+- transform: translateY(0)
+
 ## CSS Variables (Design Tokens)
 
 \`\`\`css
@@ -167,6 +188,10 @@ Analysis of "Stripe" (https://stripe.com)
   /* Spacing */
   --spacing-unit: 8px;
   --spacing-md: 16px;
+
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 \`\`\`
 ```
@@ -307,8 +332,8 @@ If DesignMirror helped you, please:
 
 ## 📬 Contact
 
-- **Issues**: [GitHub Issues](https://github.com/kgarbacinski/design-mirror/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/kgarbacinski/design-mirror/discussions)
+- **Issues**: [GitHub Issues](https://github.com/kgarbacinski/design-mirror-ai/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/kgarbacinski/design-mirror-ai/discussions)
 
 ---
 
