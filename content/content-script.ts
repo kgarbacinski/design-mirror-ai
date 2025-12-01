@@ -11,6 +11,12 @@ import { SpacingAnalyzer } from './analyzers/spacing-analyzer';
 import { ShadowAnalyzer } from './analyzers/shadow-analyzer';
 import { BorderAnalyzer } from './analyzers/border-analyzer';
 import { ComponentDetector } from './analyzers/component-detector';
+import { InteractiveStateAnalyzer } from './analyzers/interactive-state-analyzer';
+import { CSSAnimationAnalyzer } from './analyzers/css-animation-analyzer';
+import { TransformAnalyzer } from './analyzers/transform-analyzer';
+import { ThemeSwitcherAnalyzer } from './analyzers/theme-switcher-analyzer';
+import { JSAnimationAnalyzer } from './analyzers/js-animation-analyzer';
+import { BehavioralPatternAnalyzer } from './analyzers/behavioral-pattern-analyzer';
 import { CombinedGenerator } from './generators/combined-generator';
 
 console.log('[DesignMirror Content Script] Loaded on:', window.location.href);
@@ -76,6 +82,12 @@ const handleStartAnalysis = async (sendResponse: (response?: any) => void) => {
     const shadowAnalyzer = new ShadowAnalyzer();
     const borderAnalyzer = new BorderAnalyzer();
     const componentDetector = new ComponentDetector();
+    const interactiveStateAnalyzer = new InteractiveStateAnalyzer();
+    const cssAnimationAnalyzer = new CSSAnimationAnalyzer();
+    const transformAnalyzer = new TransformAnalyzer();
+    const themeSwitcherAnalyzer = new ThemeSwitcherAnalyzer();
+    const jsAnimationAnalyzer = new JSAnimationAnalyzer();
+    const behavioralPatternAnalyzer = new BehavioralPatternAnalyzer();
 
     // Run analyzers
     sendProgress(65, 'Analyzing colors...');
@@ -96,7 +108,26 @@ const handleStartAnalysis = async (sendResponse: (response?: any) => void) => {
     sendProgress(90, 'Detecting components...');
     const components = componentDetector.detect(styleCache);
 
-    sendProgress(95, 'Generating prompt...');
+    // Run interactive pattern analyzers
+    sendProgress(91, 'Analyzing interactive states...');
+    const interactiveStates = interactiveStateAnalyzer.analyze();
+
+    sendProgress(92, 'Analyzing CSS animations...');
+    const cssAnimations = cssAnimationAnalyzer.analyze(allElements, styleCache);
+
+    sendProgress(93, 'Analyzing transforms...');
+    const transforms = transformAnalyzer.analyze(allElements, styleCache);
+
+    sendProgress(94, 'Detecting theme switchers...');
+    const themeSwitchers = await themeSwitcherAnalyzer.analyze();
+
+    sendProgress(95, 'Analyzing JS animations...');
+    const jsAnimations = await jsAnimationAnalyzer.analyze(allElements);
+
+    sendProgress(96, 'Detecting behavioral patterns...');
+    const behavioral = behavioralPatternAnalyzer.analyze();
+
+    sendProgress(98, 'Generating prompt...');
 
     // Build result
     const result: AnalysisResult = {
@@ -109,7 +140,15 @@ const handleStartAnalysis = async (sendResponse: (response?: any) => void) => {
       spacing,
       shadows,
       borders,
-      components
+      components,
+      interactions: {
+        themeSwitchers,
+        cssAnimations,
+        transforms,
+        interactiveStates,
+        jsAnimations,
+        behavioral
+      }
     };
 
     // Generate prompt
