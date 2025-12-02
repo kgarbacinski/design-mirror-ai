@@ -7,7 +7,9 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-18-61dafb?style=for-the-badge&logo=react)](https://reactjs.org/)
 
-![DesignMirror Demo](docs/assets/present-addon.gif)
+<p align="center">
+  <img src="docs/assets/present-addon.gif" alt="DesignMirror Demo" width="800"/>
+</p>
 
 ## ✨ What is DesignMirror?
 
