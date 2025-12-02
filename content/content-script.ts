@@ -1,5 +1,3 @@
-// Content Script for DesignMirror
-// Runs on web pages and performs design system analysis
 
 import { DOMWalker } from './utils/dom-walker';
 import { StyleCache } from './utils/style-cache';
@@ -21,10 +19,8 @@ import { CombinedGenerator } from './generators/combined-generator';
 
 console.log('[DesignMirror Content Script] Loaded on:', window.location.href);
 
-// State
 let isAnalyzing = false;
 
-// Handler function
 const handleStartAnalysis = async (sendResponse: (response?: any) => void) => {
   if (isAnalyzing) {
     sendResponse({ success: false, error: 'Analysis already in progress' });
@@ -35,7 +31,6 @@ const handleStartAnalysis = async (sendResponse: (response?: any) => void) => {
   isAnalyzing = true;
 
   try {
-    // Initialize infrastructure
     const domWalker = new DOMWalker({
       includeInvisible: false,
       includeShadowDOM: true
@@ -43,7 +38,6 @@ const handleStartAnalysis = async (sendResponse: (response?: any) => void) => {
 
     const styleCache = new StyleCache();
 
-    // Progress tracking
     const sendProgress = (progress: number, stage: string) => {
       chrome.runtime.sendMessage({
         type: MessageType.ANALYSIS_PROGRESS,
@@ -54,13 +48,11 @@ const handleStartAnalysis = async (sendResponse: (response?: any) => void) => {
 
     sendProgress(10, 'Initializing DOM Walker...');
 
-    // Count visible elements
     const elementCount = await domWalker.count(document.body);
     console.log('[Content Script] Found', elementCount, 'visible elements');
 
     sendProgress(20, `Analyzing ${elementCount} elements...`);
 
-    // Collect all elements
     const allElements: Element[] = [];
     await domWalker.walk(
       document.body,
@@ -75,7 +67,6 @@ const handleStartAnalysis = async (sendResponse: (response?: any) => void) => {
 
     sendProgress(60, 'Running analyzers...');
 
-    // Initialize analyzers
     const colorAnalyzer = new ColorAnalyzer();
     const typographyAnalyzer = new TypographyAnalyzer();
     const spacingAnalyzer = new SpacingAnalyzer();
@@ -89,7 +80,6 @@ const handleStartAnalysis = async (sendResponse: (response?: any) => void) => {
     const jsAnimationAnalyzer = new JSAnimationAnalyzer();
     const behavioralPatternAnalyzer = new BehavioralPatternAnalyzer();
 
-    // Run analyzers
     sendProgress(65, 'Analyzing colors...');
     const colors = colorAnalyzer.analyze(allElements, styleCache);
 
@@ -108,7 +98,6 @@ const handleStartAnalysis = async (sendResponse: (response?: any) => void) => {
     sendProgress(90, 'Detecting components...');
     const components = componentDetector.detect(styleCache);
 
-    // Run interactive pattern analyzers
     sendProgress(91, 'Analyzing interactive states...');
     const interactiveStates = interactiveStateAnalyzer.analyze();
 
@@ -129,7 +118,6 @@ const handleStartAnalysis = async (sendResponse: (response?: any) => void) => {
 
     sendProgress(98, 'Generating prompt...');
 
-    // Build result
     const result: AnalysisResult = {
       url: window.location.href,
       title: document.title,
@@ -151,17 +139,14 @@ const handleStartAnalysis = async (sendResponse: (response?: any) => void) => {
       }
     };
 
-    // Generate prompt
     const generator = new CombinedGenerator();
     const prompt = generator.generate(result);
 
     sendProgress(98, 'Finalizing...');
 
-    // Get cache stats
     const cacheStats = styleCache.getStats();
     console.log('[Content Script] Style cache stats:', cacheStats);
 
-    // Add debug info
     console.log('[Content Script] Analysis complete:', {
       elementCount,
       colorClusters: colors.all.length,
@@ -173,12 +158,10 @@ const handleStartAnalysis = async (sendResponse: (response?: any) => void) => {
       promptLength: prompt.combined.length
     });
 
-    // Log first 500 chars of prompt for debugging
     console.log('[Content Script] Generated prompt preview:', prompt.combined.substring(0, 500));
 
     sendProgress(100, 'Analysis complete!');
 
-    // Send result back to background (with prompt)
     chrome.runtime.sendMessage({
       type: MessageType.ANALYSIS_COMPLETE,
       result: { ...result, prompt } // Include prompt in result
@@ -200,7 +183,6 @@ const handleStartAnalysis = async (sendResponse: (response?: any) => void) => {
   }
 };
 
-// Listen for messages from background script
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   console.log('[Content Script] Received message:', message.type);
 
@@ -218,5 +200,4 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 console.log('[DesignMirror Content Script] Ready');
 
-// Export to make this a module (avoids global scope conflicts)
 export {};

@@ -46,18 +46,15 @@ export class DOMWalker {
     let estimatedTotal = this.estimateElementCount(rootElement);
 
     while (queue.length > 0) {
-      // Use requestIdleCallback for better performance
       await this.waitForIdle();
 
       const batch = queue.splice(0, this.BATCH_SIZE);
 
       for (const element of batch) {
-        // Apply filters
         if (!this.shouldProcessElement(element)) {
           continue;
         }
 
-        // Visit element
         try {
           visitor(element);
           processed++;
@@ -69,12 +66,10 @@ export class DOMWalker {
           console.warn('[DOMWalker] Error visiting element:', error, element);
         }
 
-        // Add children to queue
         this.addChildrenToQueue(element, queue);
       }
     }
 
-    // Final progress update
     if (onProgress) {
       onProgress(processed, processed);
     }
@@ -111,17 +106,14 @@ export class DOMWalker {
    * Check if element should be processed
    */
   private shouldProcessElement(element: Element): boolean {
-    // Skip certain tags
     if (SKIP_TAGS.has(element.tagName)) {
       return false;
     }
 
-    // Check visibility
     if (!this.includeInvisible && !this.isElementVisible(element)) {
       return false;
     }
 
-    // Apply custom filter
     if (this.customFilter && !this.customFilter(element)) {
       return false;
     }
@@ -133,10 +125,8 @@ export class DOMWalker {
    * Add children to processing queue
    */
   private addChildrenToQueue(element: Element, queue: Element[]): void {
-    // Regular children
     queue.push(...Array.from(element.children));
 
-    // Shadow DOM children
     if (this.includeShadowDOM && element.shadowRoot) {
       queue.push(...Array.from(element.shadowRoot.children));
     }
@@ -158,7 +148,6 @@ export class DOMWalker {
         rect.height > 0
       );
     } catch (error) {
-      // In case getComputedStyle fails (e.g., detached element)
       return false;
     }
   }
@@ -168,10 +157,8 @@ export class DOMWalker {
    */
   private estimateElementCount(root: Element): number {
     try {
-      // Quick estimate using querySelectorAll
       return root.querySelectorAll('*').length;
     } catch {
-      // Fallback to rough estimate
       return 1000;
     }
   }
@@ -184,7 +171,6 @@ export class DOMWalker {
       if ('requestIdleCallback' in window) {
         requestIdleCallback(() => resolve(), { timeout: 100 });
       } else {
-        // Fallback for browsers without requestIdleCallback
         setTimeout(resolve, 0);
       }
     });

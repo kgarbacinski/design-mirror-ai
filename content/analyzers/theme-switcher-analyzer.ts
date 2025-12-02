@@ -23,31 +23,26 @@ export class ThemeSwitcherAnalyzer {
     console.log('[ThemeSwitcherAnalyzer] Starting theme detection...');
     console.log('[ThemeSwitcherAnalyzer] ========================================');
 
-    // FIRST: Log complete DOM snapshot for debugging
     this.logDOMSnapshot();
 
-    // Check for data-theme attribute
     const dataThemePattern = this.detectDataTheme();
     if (dataThemePattern) {
       console.log('[ThemeSwitcherAnalyzer] Found data-theme pattern:', dataThemePattern);
       patterns.push(dataThemePattern);
     }
 
-    // Check for class-based theming (.dark, .light, etc.)
     const classThemePattern = this.detectClassBasedTheme();
     if (classThemePattern) {
       console.log('[ThemeSwitcherAnalyzer] Found class-based pattern:', classThemePattern);
       patterns.push(classThemePattern);
     }
 
-    // Check for CSS variable swapping
     const cssVarPattern = this.detectCSSVariableTheme();
     if (cssVarPattern) {
       console.log('[ThemeSwitcherAnalyzer] Found CSS variable pattern:', cssVarPattern);
       patterns.push(cssVarPattern);
     }
 
-    // Check for prefers-color-scheme media queries
     const mediaQueryPattern = this.detectMediaQueryTheme();
     if (mediaQueryPattern) {
       console.log('[ThemeSwitcherAnalyzer] Found media query pattern:', mediaQueryPattern);
@@ -69,7 +64,6 @@ export class ThemeSwitcherAnalyzer {
     const htmlElement = document.documentElement;
     const bodyElement = document.body;
 
-    // 1. All data-* attributes on <html>
     console.group('🏷️  HTML data-* attributes:');
     const htmlDataAttrs: Record<string, string> = {};
     Array.from(htmlElement.attributes).forEach(attr => {
@@ -80,13 +74,11 @@ export class ThemeSwitcherAnalyzer {
     console.log(Object.keys(htmlDataAttrs).length > 0 ? htmlDataAttrs : 'None found');
     console.groupEnd();
 
-    // 2. All classes on <html>
     console.group('🎨 HTML classes:');
     const htmlClasses = Array.from(htmlElement.classList);
     console.log(htmlClasses.length > 0 ? htmlClasses : 'None found');
     console.groupEnd();
 
-    // 3. All data-* attributes on <body>
     console.group('🏷️  BODY data-* attributes:');
     const bodyDataAttrs: Record<string, string> = {};
     if (bodyElement) {
@@ -99,13 +91,11 @@ export class ThemeSwitcherAnalyzer {
     console.log(Object.keys(bodyDataAttrs).length > 0 ? bodyDataAttrs : 'None found');
     console.groupEnd();
 
-    // 4. All classes on <body>
     console.group('🎨 BODY classes:');
     const bodyClasses = bodyElement ? Array.from(bodyElement.classList) : [];
     console.log(bodyClasses.length > 0 ? bodyClasses : 'None found');
     console.groupEnd();
 
-    // 5. All localStorage keys and values
     console.group('💾 localStorage:');
     try {
       const storageData: Record<string, string> = {};
@@ -121,7 +111,6 @@ export class ThemeSwitcherAnalyzer {
     }
     console.groupEnd();
 
-    // 6. Find all potential mode/theme buttons
     console.group('🔘 Potential mode/theme buttons:');
     const buttons = Array.from(document.querySelectorAll('button, [role="button"], [role="switch"], a[role="button"]'));
     let foundCount = 0;
@@ -158,17 +147,14 @@ export class ThemeSwitcherAnalyzer {
     }
     console.groupEnd();
 
-    // 7. CSS custom properties that might be theme-related
     console.group('🎨 CSS Custom Properties (--*):');
     try {
       const rootStyles = getComputedStyle(htmlElement);
       const cssVars: Record<string, string> = {};
 
-      // Get all properties that start with --
       Array.from(rootStyles).forEach(prop => {
         if (prop.startsWith('--')) {
           const value = rootStyles.getPropertyValue(prop).trim();
-          // Only show theme-related vars
           if (/color|theme|bg|background|primary|secondary|accent|dark|light|mode/i.test(prop)) {
             cssVars[prop] = value.substring(0, 50);
           }
@@ -203,7 +189,6 @@ export class ThemeSwitcherAnalyzer {
     const htmlElement = document.documentElement;
     const bodyElement = document.body;
 
-    // Check for data-theme or data-mode on html or body
     const htmlTheme = htmlElement.getAttribute('data-theme') || htmlElement.getAttribute('data-mode');
     const bodyTheme = bodyElement?.getAttribute('data-theme') || bodyElement?.getAttribute('data-mode');
 
@@ -217,16 +202,12 @@ export class ThemeSwitcherAnalyzer {
 
     if (!currentTheme) return null;
 
-    // Try to find toggle button
     const toggleElement = this.findThemeToggle();
 
-    // Extract CSS variables that change with theme
     const cssVariables = this.extractThemeVariables();
 
-    // Check localStorage for theme preference
     const storageKey = this.detectStorageKey();
 
-    // Detect available themes
     const themes = this.detectAvailableThemes(currentTheme);
 
     return {
@@ -262,7 +243,6 @@ export class ThemeSwitcherAnalyzer {
     const cssVariables = this.extractThemeVariables();
     const storageKey = this.detectStorageKey();
 
-    // Try to detect available themes
     const themes: string[] = [currentTheme];
     if (currentTheme === 'dark') {
       themes.push('light');
@@ -296,10 +276,8 @@ export class ThemeSwitcherAnalyzer {
   private detectCSSVariableTheme(): ThemeSwitcherPattern | null {
     const cssVariables = this.extractThemeVariables();
 
-    // If we have theme-related CSS variables, it might be CSS variable theming
     if (cssVariables.length === 0) return null;
 
-    // Check if there are multiple values for the same variable (indicating themes)
     const hasMultipleValues = cssVariables.some(
       v => Object.keys(v.values).length > 1
     );
@@ -309,7 +287,6 @@ export class ThemeSwitcherAnalyzer {
     const toggleElement = this.findThemeToggle();
     const storageKey = this.detectStorageKey();
 
-    // Extract theme names from variable values
     const themeNames = new Set<string>();
     for (const v of cssVariables) {
       Object.keys(v.values).forEach(theme => themeNames.add(theme));
@@ -331,7 +308,6 @@ export class ThemeSwitcherAnalyzer {
   private findThemeToggle(): string | null {
     console.log('[ThemeSwitcherAnalyzer] Looking for theme toggle button...');
 
-    // Look for common theme toggle patterns
     const selectors = [
       'button[aria-label*="theme" i]',
       'button[aria-label*="dark" i]',
@@ -359,7 +335,6 @@ export class ThemeSwitcherAnalyzer {
       }
     }
 
-    // Look for buttons with moon/sun icons OR mode switches
     const buttons = Array.from(document.querySelectorAll('button, a[role="button"], [role="switch"]'));
     console.log('[ThemeSwitcherAnalyzer] Scanning', buttons.length, 'interactive elements...');
 
@@ -371,7 +346,6 @@ export class ThemeSwitcherAnalyzer {
         .map(attr => attr.name + '=' + attr.value)
         .join(' ');
 
-      // Check for theme-related keywords
       if (
         text.includes('theme') ||
         text.includes('dark') ||
@@ -409,17 +383,14 @@ export class ThemeSwitcherAnalyzer {
     const variables: Array<{ name: string; values: Record<string, string> }> = [];
 
     try {
-      // Get computed style of root
       const rootStyles = getComputedStyle(document.documentElement);
 
-      // Common theme variable patterns
       const themeVarPatterns = [
         /--(?:color|bg|background|text|primary|secondary|accent)/i,
         /--theme-/i,
         /--(?:dark|light)-/i
       ];
 
-      // Extract variables from :root
       const styleSheets = document.styleSheets;
 
       for (let i = 0; i < styleSheets.length; i++) {
@@ -454,7 +425,6 @@ export class ThemeSwitcherAnalyzer {
             }
           }
         } catch (e) {
-          // CORS
         }
       }
     } catch (e) {
@@ -490,7 +460,6 @@ export class ThemeSwitcherAnalyzer {
         }
       }
     } catch (e) {
-      // localStorage might not be accessible
     }
 
     return null;
@@ -502,14 +471,12 @@ export class ThemeSwitcherAnalyzer {
   private detectAvailableThemes(currentTheme: string): string[] {
     const themes = [currentTheme];
 
-    // Common theme combinations
     if (currentTheme === 'dark') {
       themes.push('light');
     } else if (currentTheme === 'light') {
       themes.push('dark');
     }
 
-    // Check if there are more themes in stylesheets
     try {
       const styleSheets = document.styleSheets;
 
@@ -524,7 +491,6 @@ export class ThemeSwitcherAnalyzer {
             if (rule instanceof CSSStyleRule) {
               const selector = rule.selectorText;
 
-              // Look for [data-theme="..."] selectors
               const match = selector.match(/\[data-theme=["']([^"']+)["']\]/);
               if (match && !themes.includes(match[1])) {
                 themes.push(match[1]);
@@ -532,7 +498,6 @@ export class ThemeSwitcherAnalyzer {
             }
           }
         } catch (e) {
-          // CORS
         }
       }
     } catch (e) {
@@ -577,7 +542,6 @@ export class ThemeSwitcherAnalyzer {
             }
           }
         } catch (e) {
-          // CORS - can't access external stylesheets
         }
       }
     } catch (e) {
@@ -589,7 +553,6 @@ export class ThemeSwitcherAnalyzer {
       if (foundLight) themes.push('light');
       if (foundDark) themes.push('dark');
 
-      // Check current system preference
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       const currentTheme = prefersDark ? 'dark' : 'light';
 

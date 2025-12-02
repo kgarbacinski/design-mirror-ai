@@ -17,7 +17,6 @@ export class ShadowAnalyzer {
     for (const element of elements) {
       const styles = styleCache.getByCategory(element, 'shadows');
 
-      // Box shadows
       if (styles.boxShadow && styles.boxShadow !== 'none') {
         boxShadows.set(
           styles.boxShadow,
@@ -25,7 +24,6 @@ export class ShadowAnalyzer {
         );
       }
 
-      // Text shadows
       if (styles.textShadow && styles.textShadow !== 'none') {
         textShadows.set(
           styles.textShadow,
@@ -34,7 +32,6 @@ export class ShadowAnalyzer {
       }
     }
 
-    // Convert to arrays and sort by frequency
     const boxShadowInfos = this.toShadowInfos(boxShadows, 'box');
     const textShadowInfos = this.toShadowInfos(textShadows, 'text');
 

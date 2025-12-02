@@ -35,16 +35,13 @@ export class TransformAnalyzer {
         continue;
       }
 
-      // Parse transform functions
       const functions = this.parseTransform(transform);
 
       for (const func of functions) {
-        // Check for 3D transforms
         if (this.is3DFunction(func.name)) {
           has3D = true;
         }
 
-        // Track function usage
         let funcData = functionMap.get(func.name);
         if (!funcData) {
           funcData = {
@@ -57,7 +54,6 @@ export class TransformAnalyzer {
 
         funcData.count++;
 
-        // Add example (limit to 3)
         if (funcData.examples.length < 3) {
           const selector = this.getSimpleSelector(element);
           funcData.examples.push({
@@ -67,7 +63,6 @@ export class TransformAnalyzer {
         }
       }
 
-      // Check for perspective
       const perspective = styles.perspective;
       if (perspective && perspective !== 'none') {
         has3D = true;
@@ -98,8 +93,6 @@ export class TransformAnalyzer {
   ): Array<{ name: string; value: string }> {
     const functions: Array<{ name: string; value: string }> = [];
 
-    // Match function names and their arguments
-    // e.g., "translateX(10px)", "rotate(45deg)", "scale3d(1, 1, 1)"
     const funcRegex = /([a-zA-Z0-9]+)\(([^)]+)\)/g;
     let match;
 

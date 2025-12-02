@@ -29,7 +29,6 @@ export class ColorAnalyzer {
   analyze(elements: Element[], styleCache: StyleCache): ColorPalette {
     const colorFrequency = new Map<string, ColorInfo>();
 
-    // Step 1: Extract all colors
     for (const element of elements) {
       const styles = styleCache.getByCategory(element, 'colors');
 
@@ -37,23 +36,18 @@ export class ColorAnalyzer {
       this.extractColor(styles.backgroundColor, 'background', colorFrequency);
       this.extractColor(styles.borderColor, 'border', colorFrequency);
 
-      // Individual border colors
       this.extractColor(styles.borderTopColor, 'border', colorFrequency);
       this.extractColor(styles.borderRightColor, 'border', colorFrequency);
       this.extractColor(styles.borderBottomColor, 'border', colorFrequency);
       this.extractColor(styles.borderLeftColor, 'border', colorFrequency);
     }
 
-    // Step 2: Filter edge cases
     this.filterEdgeCases(colorFrequency);
 
-    // Step 3: Cluster similar colors
     const clusters = this.clusterColors(colorFrequency);
 
-    // Step 4: Identify roles
     const palette = this.identifyColorRoles(clusters);
 
-    // Step 5: Extract CSS variables
     palette.cssVariables = this.extractCSSVariables();
 
     return palette;
@@ -69,7 +63,6 @@ export class ColorAnalyzer {
   ): void {
     if (!colorValue) return;
 
-    // Skip transparent colors
     if (
       colorValue === 'transparent' ||
       colorValue === 'rgba(0, 0, 0, 0)' ||
@@ -78,7 +71,6 @@ export class ColorAnalyzer {
       return;
     }
 
-    // Normalize to hex
     const normalized = this.normalizeColor(colorValue);
     if (!normalized) return;
 
@@ -106,7 +98,6 @@ export class ColorAnalyzer {
     const toDelete: string[] = [];
 
     for (const [hex, info] of colorFrequency.entries()) {
-      // Remove colors used only once
       if (info.count === 1) {
         toDelete.push(hex);
       }
@@ -124,18 +115,15 @@ export class ColorAnalyzer {
     const colors = Array.from(colorFrequency.values());
     const clusters: ColorCluster[] = [];
 
-    // Sort by frequency (most common first)
     colors.sort((a, b) => b.count - a.count);
 
     for (const color of colors) {
-      // Find nearest cluster
       let nearestCluster: ColorCluster | null = null;
       let minDistance = Infinity;
 
       for (const cluster of clusters) {
         const distance = this.colorDistance(color.rgb, cluster.centroid.rgb);
 
-        // Delta E threshold: colors with deltaE < 10 are perceptually similar
         if (distance < 10 && distance < minDistance) {
           nearestCluster = cluster;
           minDistance = distance;
@@ -143,16 +131,13 @@ export class ColorAnalyzer {
       }
 
       if (nearestCluster) {
-        // Add to existing cluster
         nearestCluster.colors.push(color);
         nearestCluster.totalCount += color.count;
 
-        // Merge usages
         for (const usage of color.usages) {
           nearestCluster.centroid.usages.add(usage);
         }
       } else {
-        // Create new cluster
         clusters.push({
           centroid: color,
           colors: [color],
@@ -161,7 +146,6 @@ export class ColorAnalyzer {
       }
     }
 
-    // Sort clusters by total count
     clusters.sort((a, b) => b.totalCount - a.totalCount);
 
     return clusters;
@@ -189,13 +173,11 @@ export class ColorAnalyzer {
     for (const cluster of clusters) {
       const hsl = this.rgbToHsl(cluster.centroid.rgb);
 
-      // Neutrals (low saturation)
       if (hsl.s < 0.15) {
         palette.neutrals.push(cluster);
         continue;
       }
 
-      // Semantic colors (by hue)
       if (this.isRedHue(hsl.h) && !palette.semantic.error) {
         palette.semantic.error = cluster;
         continue;
@@ -210,7 +192,6 @@ export class ColorAnalyzer {
         continue;
       }
 
-      // Primary/Secondary/Accent (saturated colors)
       if (!palette.primary && hsl.s > 0.3 && cluster.totalCount > 10) {
         palette.primary = cluster;
       } else if (!palette.secondary && hsl.s > 0.3 && cluster.totalCount > 5) {
@@ -241,14 +222,12 @@ export class ColorAnalyzer {
    * Normalize color to hex format
    */
   private normalizeColor(color: string): string | null {
-    // Already hex
     if (color.startsWith('#')) {
       return color.length === 4
         ? this.expandShortHex(color)
         : color.toUpperCase();
     }
 
-    // RGB/RGBA
     if (color.startsWith('rgb')) {
       const match = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
       if (match) {
@@ -259,14 +238,12 @@ export class ColorAnalyzer {
       }
     }
 
-    // Named colors (simplified - would need full lookup table)
     const namedColors: Record<string, string> = {
       'white': '#FFFFFF',
       'black': '#000000',
       'red': '#FF0000',
       'green': '#008000',
       'blue': '#0000FF'
-      // ... more named colors could be added
     };
 
     return namedColors[color.toLowerCase()] || null;
@@ -342,7 +319,6 @@ export class ColorAnalyzer {
    * Convert RGB to LAB color space (simplified)
    */
   private rgbToLab(rgb: RGB): LAB {
-    // Convert RGB to XYZ
     let r = rgb.r / 255;
     let g = rgb.g / 255;
     let b = rgb.b / 255;
@@ -404,7 +380,6 @@ export class ColorAnalyzer {
                 if (prop.startsWith('--')) {
                   const value = style.getPropertyValue(prop);
 
-                  // Only include color-related variables
                   if (this.looksLikeColor(value)) {
                     variables.push({
                       name: prop,
@@ -417,7 +392,6 @@ export class ColorAnalyzer {
             }
           }
         } catch (e) {
-          // CORS - external stylesheets may throw
           console.warn('[ColorAnalyzer] Could not access stylesheet:', e);
         }
       }

@@ -29,7 +29,6 @@ export class CodeGenerator {
   private generateCSSVariables(analysis: AnalysisResult): string {
     let css = `:root {\n`;
 
-    // Colors
     css += `  /* ===== Colors ===== */\n`;
 
     if (analysis.colors.primary) {
@@ -40,12 +39,10 @@ export class CodeGenerator {
       css += `  --color-secondary: ${analysis.colors.secondary.centroid.hex};\n`;
     }
 
-    // Accent colors
     analysis.colors.accent.forEach((accent, i) => {
       css += `  --color-accent-${i + 1}: ${accent.centroid.hex};\n`;
     });
 
-    // Neutrals
     if (analysis.colors.neutrals.length > 0) {
       css += `\n  /* Neutrals */\n`;
       analysis.colors.neutrals.forEach((neutral, i) => {
@@ -54,7 +51,6 @@ export class CodeGenerator {
       });
     }
 
-    // Semantic
     const { semantic } = analysis.colors;
     if (semantic.error || semantic.success || semantic.warning || semantic.info) {
       css += `\n  /* Semantic */\n`;
@@ -64,7 +60,6 @@ export class CodeGenerator {
       if (semantic.info) css += `  --color-info: ${semantic.info.centroid.hex};\n`;
     }
 
-    // Typography
     css += `\n  /* ===== Typography ===== */\n`;
 
     if (analysis.typography.primaryFont) {
@@ -75,7 +70,6 @@ export class CodeGenerator {
       css += `  --font-secondary: ${analysis.typography.secondaryFont.name};\n`;
     }
 
-    // Font sizes
     const scale = analysis.typography.fontScale;
     if (scale.base) {
       css += `\n  /* Font sizes */\n`;
@@ -89,7 +83,6 @@ export class CodeGenerator {
       if (scale['4xl']) css += `  --font-size-4xl: ${scale['4xl']};\n`;
     }
 
-    // Font weights
     if (analysis.typography.weights.length > 0) {
       css += `\n  /* Font weights */\n`;
       const weights = analysis.typography.weights;
@@ -100,7 +93,6 @@ export class CodeGenerator {
       if (weights.includes(700)) css += `  --font-weight-bold: 700;\n`;
     }
 
-    // Spacing
     css += `\n  /* ===== Spacing ===== */\n`;
     css += `  --spacing-unit: ${analysis.spacing.baseUnit}px;\n`;
 
@@ -108,7 +100,6 @@ export class CodeGenerator {
       css += `  --spacing-${name}: ${value};\n`;
     }
 
-    // Shadows
     if (analysis.shadows.common.length > 0) {
       css += `\n  /* ===== Shadows ===== */\n`;
       analysis.shadows.common.slice(0, 5).forEach((shadow, i) => {
@@ -116,7 +107,6 @@ export class CodeGenerator {
       });
     }
 
-    // Border radius
     if (analysis.borders.radii.length > 0) {
       css += `\n  /* ===== Border Radius ===== */\n`;
       analysis.borders.radii.slice(0, 5).forEach((radius, i) => {
@@ -124,7 +114,6 @@ export class CodeGenerator {
       });
     }
 
-    // Transitions & Animations
     if (analysis.interactions.cssAnimations.transitions.length > 0) {
       css += `\n  /* ===== Transitions ===== */\n`;
       const topTransitions = analysis.interactions.cssAnimations.transitions.slice(0, 3);
@@ -146,7 +135,6 @@ export class CodeGenerator {
     const grouped = this.groupByType(components);
 
     for (const [type, instances] of Object.entries(grouped)) {
-      // Get most representative example (highest confidence)
       const representative = instances.sort((a, b) => b.confidence - a.confidence)[0];
 
       examples.push({
@@ -184,16 +172,13 @@ export class CodeGenerator {
     const s = component.styles;
     let css = `.${className} {\n`;
 
-    // Layout
     if (s.layout.display) css += `  display: ${s.layout.display};\n`;
 
-    // Spacing
     if (s.spacing.padding) css += `  padding: ${s.spacing.padding};\n`;
     if (s.spacing.margin && s.spacing.margin !== '0px') {
       css += `  margin: ${s.spacing.margin};\n`;
     }
 
-    // Colors
     if (s.colors.color && s.colors.color !== 'rgb(0, 0, 0)') {
       css += `  color: ${s.colors.color};\n`;
     }
@@ -201,13 +186,11 @@ export class CodeGenerator {
       css += `  background-color: ${s.colors.backgroundColor};\n`;
     }
 
-    // Typography
     if (s.typography.fontSize) css += `  font-size: ${s.typography.fontSize};\n`;
     if (s.typography.fontWeight && s.typography.fontWeight !== '400') {
       css += `  font-weight: ${s.typography.fontWeight};\n`;
     }
 
-    // Borders
     if (s.borders.borderRadius && s.borders.borderRadius !== '0px') {
       css += `  border-radius: ${s.borders.borderRadius};\n`;
     }
@@ -215,7 +198,6 @@ export class CodeGenerator {
       css += `  border: ${s.borders.borderWidth} ${s.borders.borderStyle} ${s.colors.borderColor};\n`;
     }
 
-    // Shadows
     if (s.shadows.boxShadow && s.shadows.boxShadow !== 'none') {
       css += `  box-shadow: ${s.shadows.boxShadow};\n`;
     }
@@ -231,7 +213,6 @@ export class CodeGenerator {
   private generateUtilityClasses(analysis: AnalysisResult): string {
     let css = `/* Utility Classes */\n\n`;
 
-    // Spacing utilities
     css += `/* Spacing */\n`;
     for (const [name, value] of Object.entries(analysis.spacing.scale)) {
       css += `.p-${name} { padding: ${value}; }\n`;

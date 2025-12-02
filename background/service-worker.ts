@@ -1,16 +1,12 @@
-// Background Service Worker for DesignMirror
-// Handles coordination between popup and content script
 
 import { MessageType } from '@shared/types/messages.types';
 
 console.log('[DesignMirror] Service worker initialized');
 
-// Handler functions
 const handleStartAnalysis = async (sender: chrome.runtime.MessageSender, sendResponse: (response?: any) => void) => {
   console.log('[Background] Starting analysis');
 
   try {
-    // Get active tab
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
     if (!tab.id) {
@@ -18,29 +14,24 @@ const handleStartAnalysis = async (sender: chrome.runtime.MessageSender, sendRes
       return;
     }
 
-    // Check if URL is injectable (not chrome://, chrome-extension://, etc.)
     if (tab.url?.startsWith('chrome://') || tab.url?.startsWith('chrome-extension://') || tab.url?.startsWith('edge://')) {
       sendResponse({ success: false, error: 'Cannot analyze browser internal pages' });
       return;
     }
 
-    // Try to send message first (content script might already be loaded)
     chrome.tabs.sendMessage(
       tab.id,
       { type: MessageType.START_ANALYSIS },
       (response) => {
-        // If content script is not loaded, inject it
         if (chrome.runtime.lastError) {
           console.log('[Background] Content script not loaded, injecting...');
 
-          // Inject content script programmatically
           chrome.scripting.executeScript({
             target: { tabId: tab.id! },
             files: ['content/content-script.js']
           }).then(() => {
             console.log('[Background] Content script injected, sending message...');
 
-            // Wait a bit for content script to initialize
             setTimeout(() => {
               chrome.tabs.sendMessage(
                 tab.id!,
@@ -76,7 +67,6 @@ const handleStartAnalysis = async (sender: chrome.runtime.MessageSender, sendRes
 const handleAnalysisComplete = (result: any) => {
   console.log('[Background] Analysis complete, result:', result);
 
-  // Could save to storage, send to popup, etc.
   chrome.storage.local.set({
     lastAnalysis: {
       timestamp: Date.now(),
@@ -96,7 +86,6 @@ const handleCopyToClipboard = async (text: string, sendResponse: (response?: any
   }
 }
 
-// Listen for messages from popup and content script
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   console.log('[Background] Received message:', message.type);
 
@@ -106,7 +95,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       break;
 
     case MessageType.ANALYSIS_PROGRESS:
-      // Forward progress to popup
       console.log(`[Background] Analysis progress: ${message.progress}% - ${message.stage}`);
       chrome.runtime.sendMessage(message); // Forward to popup
       break;
@@ -132,10 +120,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   return true; // Keep channel open for async response
 });
 
-// Handle extension icon click (optional)
 chrome.action.onClicked.addListener((tab) => {
   console.log('[Background] Extension icon clicked');
 });
 
-// Export to make this a module (avoids global scope conflicts)
 export {};

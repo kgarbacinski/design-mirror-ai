@@ -21,7 +21,6 @@ const App: React.FC = () => {
   const [error, setError] = useState<string>('');
 
   useEffect(() => {
-    // Listen for messages from background/content script
     const messageListener = (message: any) => {
       switch (message.type) {
         case MessageType.ANALYSIS_PROGRESS:
@@ -133,7 +132,6 @@ const App: React.FC = () => {
   );
 };
 
-// Mount React app
 const container = document.getElementById('root');
 if (container) {
   const root = createRoot(container);

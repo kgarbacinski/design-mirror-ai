@@ -9,7 +9,6 @@ import type { ComponentPattern, ComponentType } from '../types/design-system.typ
  * Each pattern consists of CSS selectors and heuristic functions
  */
 export const COMPONENT_PATTERNS: ComponentPattern[] = [
-  // Buttons
   {
     type: 'button',
     selectors: [
@@ -23,7 +22,6 @@ export const COMPONENT_PATTERNS: ComponentPattern[] = [
     heuristics: []
   },
 
-  // Cards
   {
     type: 'card',
     selectors: [
@@ -35,7 +33,6 @@ export const COMPONENT_PATTERNS: ComponentPattern[] = [
     heuristics: []
   },
 
-  // Navigation
   {
     type: 'navigation',
     selectors: [
@@ -48,7 +45,6 @@ export const COMPONENT_PATTERNS: ComponentPattern[] = [
     heuristics: []
   },
 
-  // Forms
   {
     type: 'form',
     selectors: [
@@ -58,7 +54,6 @@ export const COMPONENT_PATTERNS: ComponentPattern[] = [
     heuristics: []
   },
 
-  // Inputs
   {
     type: 'input',
     selectors: [
@@ -71,7 +66,6 @@ export const COMPONENT_PATTERNS: ComponentPattern[] = [
     heuristics: []
   },
 
-  // Badges
   {
     type: 'badge',
     selectors: [
@@ -83,7 +77,6 @@ export const COMPONENT_PATTERNS: ComponentPattern[] = [
     heuristics: []
   },
 
-  // Modals
   {
     type: 'modal',
     selectors: [
@@ -95,7 +88,6 @@ export const COMPONENT_PATTERNS: ComponentPattern[] = [
     heuristics: []
   },
 
-  // Tables
   {
     type: 'table',
     selectors: [
@@ -106,7 +98,6 @@ export const COMPONENT_PATTERNS: ComponentPattern[] = [
     heuristics: []
   },
 
-  // Tooltips
   {
     type: 'tooltip',
     selectors: [

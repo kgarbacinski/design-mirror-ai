@@ -32,20 +32,17 @@ export class TypographyAnalyzer {
     const fontWeights = new Map<number, number>();
     const lineHeights = new Map<string, number>();
 
-    // Heading styles
     const headingStyles: Record<string, ComputedTypography> = {};
 
     for (const element of elements) {
       const styles = styleCache.getByCategory(element, 'typography');
       const tagName = element.tagName;
 
-      // Track font families
       if (styles.fontFamily) {
         const family = this.normalizeFontFamily(styles.fontFamily);
         fontFamilies.set(family, (fontFamilies.get(family) || 0) + 1);
       }
 
-      // Track font sizes with context
       if (styles.fontSize) {
         if (!fontSizes.has(styles.fontSize)) {
           fontSizes.set(styles.fontSize, {
@@ -60,18 +57,15 @@ export class TypographyAnalyzer {
         info.contexts.add(this.getContext(element));
       }
 
-      // Track font weights
       if (styles.fontWeight) {
         const weight = this.normalizeFontWeight(styles.fontWeight);
         fontWeights.set(weight, (fontWeights.get(weight) || 0) + 1);
       }
 
-      // Track line heights
       if (styles.lineHeight && styles.lineHeight !== 'normal') {
         lineHeights.set(styles.lineHeight, (lineHeights.get(styles.lineHeight) || 0) + 1);
       }
 
-      // Special handling for headings
       if (this.HEADING_TAGS.includes(tagName)) {
         headingStyles[tagName] = {
           fontSize: styles.fontSize || '',
@@ -83,7 +77,6 @@ export class TypographyAnalyzer {
       }
     }
 
-    // Identify patterns
     return {
       primaryFont: this.getMostFrequent(fontFamilies),
       secondaryFont: this.getSecondMostFrequent(fontFamilies),
@@ -130,7 +123,6 @@ export class TypographyAnalyzer {
    * Identify type scale from font sizes
    */
   private identifyTypeScale(sizes: Map<string, FontSizeInfo>): TypeScale {
-    // Convert to numeric values
     const numericSizes = Array.from(sizes.entries())
       .map(([value, info]) => ({
         px: this.parseFontSize(value),
@@ -141,18 +133,15 @@ export class TypographyAnalyzer {
       .filter(s => s.px > 0)
       .sort((a, b) => a.px - b.px);
 
-    // Detect modular scale
     const sizeValues = numericSizes.map(s => s.px);
     const modularScale = detectModularScale(sizeValues, 0.08); // 8% tolerance
 
-    // Find base size (most common body text size)
     const baseSizeCandidate = numericSizes.find(s =>
       s.contexts.has('body') || s.contexts.has('p') || s.count > 10
     ) || numericSizes.find(s => s.px >= 14 && s.px <= 18);
 
     const basePx = baseSizeCandidate?.px || 16;
 
-    // Categorize sizes relative to base
     const categories: TypeScale = {
       xs: null,
       sm: null,
@@ -255,13 +244,11 @@ export class TypographyAnalyzer {
   private getContext(element: Element): string {
     const tagName = element.tagName.toLowerCase();
 
-    // Check for semantic tags
     if (['p', 'div', 'span', 'body'].includes(tagName)) return 'body';
     if (['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(tagName)) return tagName;
     if (['button', 'a'].includes(tagName)) return 'interactive';
     if (['small', 'caption', 'figcaption'].includes(tagName)) return 'small';
 
-    // Check for class names
     const className = element.className.toString().toLowerCase();
     if (className.includes('heading') || className.includes('title')) return 'heading';
     if (className.includes('caption') || className.includes('label')) return 'small';

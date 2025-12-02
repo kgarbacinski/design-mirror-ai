@@ -26,13 +26,10 @@ export class SpacingAnalyzer {
     for (const element of elements) {
       const styles = styleCache.getByCategory(element, 'spacing');
 
-      // Extract margins
       this.extractSpacingValues(styles, 'margin', spacingValues);
 
-      // Extract paddings
       this.extractSpacingValues(styles, 'padding', spacingValues);
 
-      // Extract gaps (flexbox/grid)
       if (styles.gap) {
         this.addSpacingValue(this.parseSpacing(styles.gap), 'gap', spacingValues);
       }
@@ -44,14 +41,11 @@ export class SpacingAnalyzer {
       }
     }
 
-    // Detect base unit (4px, 8px, 10px, 16px)
     const values = Array.from(spacingValues.keys()).filter(v => v > 0);
     const baseUnit = detectBaseUnit(values, [4, 8, 10, 16]) || 8;
 
-    // Create spacing scale
     const scale = this.createSpacingScale(spacingValues, baseUnit);
 
-    // Sort values by frequency
     const sortedValues = Array.from(spacingValues.entries())
       .sort((a, b) => b[1].count - a[1].count);
 
@@ -70,7 +64,6 @@ export class SpacingAnalyzer {
     property: 'margin' | 'padding',
     spacingValues: Map<number, SpacingInfo>
   ): void {
-    // Shorthand property
     if (styles[property]) {
       const values = this.parseShorthand(styles[property]);
       for (const value of values) {
@@ -78,7 +71,6 @@ export class SpacingAnalyzer {
       }
     }
 
-    // Individual properties
     const directions = ['Top', 'Right', 'Bottom', 'Left'];
     for (const direction of directions) {
       const key = property + direction;
@@ -148,19 +140,15 @@ export class SpacingAnalyzer {
   ): SpacingScale {
     const scale: SpacingScale = {};
 
-    // T-shirt sizing
     const scaleNames = ['xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl', '4xl', '5xl'];
 
-    // Get most common values that are multiples of base unit
     const values = Array.from(spacingValues.entries())
       .filter(([value]) => value % baseUnit === 0)
       .sort((a, b) => b[1].count - a[1].count)
       .map(([value]) => value);
 
-    // Remove duplicates and sort
     const uniqueValues = [...new Set(values)].sort((a, b) => a - b);
 
-    // Map to scale names
     for (let i = 0; i < Math.min(uniqueValues.length, scaleNames.length); i++) {
       scale[scaleNames[i]] = `${uniqueValues[i]}px`;
     }

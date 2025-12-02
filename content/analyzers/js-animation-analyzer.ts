@@ -17,16 +17,12 @@ export class JSAnimationAnalyzer {
    * Analyze JavaScript animations
    */
   public async analyze(elements: Element[]): Promise<JSAnimationPattern> {
-    // Layer 1: Detect animation libraries
     const librariesDetected = this.detectLibraries();
 
-    // Layer 2: Observe style changes (with timeout)
     const styleChanges = await this.observeStyleChanges(elements);
 
-    // Layer 3: Count event listeners (approximation)
     const eventListeners = this.detectEventListeners();
 
-    // Determine complexity
     const hasComplexAnimations =
       librariesDetected.length > 0 ||
       styleChanges.length > 5 ||
@@ -47,7 +43,6 @@ export class JSAnimationAnalyzer {
   private detectLibraries(): Array<{ name: JSAnimationLibrary; confidence: number }> {
     const libraries: Array<{ name: JSAnimationLibrary; confidence: number }> = [];
 
-    // Check window object for known libraries
     const win = window as any;
 
     if (win.gsap || win.GreenSockGlobals || win.TweenMax || win.TweenLite) {
@@ -70,7 +65,6 @@ export class JSAnimationAnalyzer {
       libraries.push({ name: 'three', confidence: 1.0 });
     }
 
-    // Check for library scripts
     const scripts = Array.from(document.querySelectorAll('script[src]'));
     for (const script of scripts) {
       const src = script.getAttribute('src')?.toLowerCase() || '';
@@ -121,11 +115,9 @@ export class JSAnimationAnalyzer {
         { properties: Set<string>; changeCount: number }
       >();
 
-      // Sample a subset of elements for performance
       const sampleSize = Math.min(elements.length, 100);
       const sampledElements = elements.slice(0, sampleSize);
 
-      // Create observer
       const observer = new MutationObserver(mutations => {
         for (const mutation of mutations) {
           if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
@@ -138,7 +130,6 @@ export class JSAnimationAnalyzer {
             const data = styleChanges.get(element)!;
             data.changeCount++;
 
-            // Try to detect which properties changed
             const style = (element as HTMLElement).style;
             for (let i = 0; i < style.length; i++) {
               data.properties.add(style[i]);
@@ -147,7 +138,6 @@ export class JSAnimationAnalyzer {
         }
       });
 
-      // Observe sampled elements
       for (const element of sampledElements) {
         observer.observe(element, {
           attributes: true,
@@ -155,13 +145,10 @@ export class JSAnimationAnalyzer {
         });
       }
 
-      // Wait for 2 seconds to collect data
       setTimeout(() => {
         observer.disconnect();
 
-        // Process results
         const results = Array.from(styleChanges.entries()).map(([element, data]) => {
-          // Determine frequency based on change count
           let frequency: 'continuous' | 'on-interaction' | 'on-load';
 
           if (data.changeCount > 10) {
@@ -190,7 +177,6 @@ export class JSAnimationAnalyzer {
   private detectEventListeners(): Array<{ event: string; count: number }> {
     const eventCounts = new Map<string, number>();
 
-    // Common animation-related events
     const events = [
       'click',
       'mouseenter',
@@ -203,7 +189,6 @@ export class JSAnimationAnalyzer {
       'transitionend'
     ];
 
-    // Count elements with onclick/onmouseenter/etc attributes
     for (const event of events) {
       const attrName = `on${event}`;
       const elementsWithAttr = document.querySelectorAll(`[${attrName}]`);
@@ -213,10 +198,7 @@ export class JSAnimationAnalyzer {
       }
     }
 
-    // Try to detect addEventListener usage (Chrome DevTools API - might not work)
-    // This is a best-effort approach
     try {
-      // Check for data attributes that suggest event handling
       const interactiveElements = document.querySelectorAll(
         '[data-animation], [data-animate], [data-scroll], [data-aos]'
       );
@@ -225,7 +207,6 @@ export class JSAnimationAnalyzer {
         eventCounts.set('scroll', (eventCounts.get('scroll') || 0) + interactiveElements.length);
       }
     } catch (e) {
-      // Ignore
     }
 
     return Array.from(eventCounts.entries())

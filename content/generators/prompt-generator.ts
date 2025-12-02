@@ -42,7 +42,6 @@ export class PromptGenerator {
     let overview = `Analysis of "${title}" (${url})\n\n`;
     overview += `This design system was extracted from a page with ${elementCount} visible elements. `;
 
-    // Describe overall style
     const primaryColor = analysis.colors.primary?.centroid.hex;
     const fontFamily = analysis.typography.primaryFont?.name;
 
@@ -50,7 +49,6 @@ export class PromptGenerator {
       overview += `The site uses ${fontFamily} as its primary typeface with ${primaryColor} as the primary brand color. `;
     }
 
-    // Spacing approach
     if (analysis.spacing.baseUnit) {
       overview += `The spacing system follows a ${analysis.spacing.baseUnit}px base unit. `;
     }
@@ -89,7 +87,6 @@ export class PromptGenerator {
       desc += `\n\n`;
     }
 
-    // Semantic colors
     const semantic = colors.semantic;
     if (semantic.error || semantic.success || semantic.warning || semantic.info) {
       desc += `**Semantic Colors**:\n`;
@@ -100,7 +97,6 @@ export class PromptGenerator {
       desc += `\n`;
     }
 
-    // CSS Variables
     if (colors.cssVariables.length > 0) {
       desc += `**Note**: Found ${colors.cssVariables.length} CSS custom properties (variables) for colors.\n\n`;
     }
@@ -124,7 +120,6 @@ export class PromptGenerator {
       desc += `- Used ${typography.secondaryFont.count} times\n\n`;
     }
 
-    // Type scale
     if (typography.fontScale) {
       const scale = typography.fontScale;
 
@@ -145,7 +140,6 @@ export class PromptGenerator {
       desc += `\n`;
     }
 
-    // Headings
     if (Object.keys(typography.headings).length > 0) {
       desc += `**Heading Styles**:\n`;
       for (const [tag, styles] of Object.entries(typography.headings)) {
@@ -158,7 +152,6 @@ export class PromptGenerator {
       desc += `\n`;
     }
 
-    // Font weights
     if (typography.weights.length > 0) {
       desc += `**Font Weights Used**: ${typography.weights.join(', ')}\n\n`;
     }
@@ -183,7 +176,6 @@ export class PromptGenerator {
       desc += `\n`;
     }
 
-    // Most common values
     if (spacing.allValues.length > 0) {
       const top5 = spacing.allValues.slice(0, 5);
       desc += `**Most Frequently Used Spacing Values**:\n`;
@@ -207,19 +199,16 @@ export class PromptGenerator {
     let desc = `## UI Components\n\n`;
     desc += `Detected ${components.length} UI components:\n\n`;
 
-    // Group by type
     const grouped = this.groupByType(components);
 
     for (const [type, instances] of Object.entries(grouped)) {
       desc += `**${this.capitalize(type)}** (${instances.length} found)\n`;
 
-      // Variations
       const variations = this.extractVariations(instances);
       if (variations.length > 0) {
         desc += `- Variations: ${variations.join(', ')}\n`;
       }
 
-      // Common styles
       const commonStyles = this.extractCommonStyles(instances);
       if (commonStyles) {
         desc += `- Common styles: ${commonStyles}\n`;
@@ -237,7 +226,6 @@ export class PromptGenerator {
   private describeInteractions(interactions: InteractionPatternSystem): string {
     let desc = `## Interactive Patterns\n\n`;
 
-    // Theme Switchers
     if (interactions.themeSwitchers.length > 0) {
       desc += `**Theme Switching**:\n`;
       for (const theme of interactions.themeSwitchers) {
@@ -256,7 +244,6 @@ export class PromptGenerator {
       desc += `\n`;
     }
 
-    // CSS Animations
     const { cssAnimations } = interactions;
     if (cssAnimations.transitions.length > 0) {
       desc += `**CSS Transitions** (${cssAnimations.transitions.length} patterns):\n`;
@@ -279,7 +266,6 @@ export class PromptGenerator {
       desc += `\n`;
     }
 
-    // Transforms
     if (interactions.transforms.functions.length > 0) {
       desc += `**Transform Effects** (${interactions.transforms.type}):\n`;
       const topTransforms = interactions.transforms.functions.slice(0, 5);
@@ -289,14 +275,12 @@ export class PromptGenerator {
       desc += `\n`;
     }
 
-    // Interactive States
     if (interactions.interactiveStates.length > 0) {
       desc += `**Interactive States** (${interactions.interactiveStates.length} selectors):\n\n`;
       const topStates = interactions.interactiveStates.slice(0, 5);
       for (const state of topStates) {
         const stateNames = Object.keys(state.states);
 
-        // Show context if available
         if (state.context) {
           const ctx = state.context;
           desc += `**${ctx.elementType || 'Element'}** (\`${state.selector}\`)`;
@@ -309,7 +293,6 @@ export class PromptGenerator {
           }
           desc += `\n`;
 
-          // Show base styles
           if (ctx.baseStyles) {
             desc += `  Base: `;
             const baseProps = Object.entries(ctx.baseStyles)
@@ -323,7 +306,6 @@ export class PromptGenerator {
           desc += `\`${state.selector}\`:\n`;
         }
 
-        // Show specific state changes
         stateNames.forEach(stateName => {
           const stateStyles = state.states[stateName as keyof typeof state.states];
           if (stateStyles && Object.keys(stateStyles).length > 0) {
@@ -338,7 +320,6 @@ export class PromptGenerator {
       }
     }
 
-    // JavaScript Animations
     if (interactions.jsAnimations.librariesDetected.length > 0) {
       desc += `**JavaScript Animation Libraries**:\n`;
       for (const lib of interactions.jsAnimations.librariesDetected) {
@@ -353,10 +334,8 @@ export class PromptGenerator {
       desc += `- Animation frequency: ${interactions.jsAnimations.styleChanges[0]?.frequency || 'varied'}\n\n`;
     }
 
-    // Behavioral Patterns (NEW!)
     const { behavioral } = interactions;
 
-    // Mode Switchers
     if (behavioral.modeSwitchers.length > 0) {
       desc += `## 🎯 Behavioral Patterns\n\n`;
       desc += `**Mode Switchers** (${behavioral.modeSwitchers.length} detected):\n\n`;
@@ -379,7 +358,6 @@ export class PromptGenerator {
       }
     }
 
-    // Toggle Buttons
     if (behavioral.toggleButtons.length > 0) {
       if (behavioral.modeSwitchers.length === 0) {
         desc += `## 🎯 Behavioral Patterns\n\n`;
@@ -400,7 +378,6 @@ export class PromptGenerator {
       desc += `\n`;
     }
 
-    // Tab Groups
     if (behavioral.tabGroups.length > 0) {
       if (behavioral.modeSwitchers.length === 0 && behavioral.toggleButtons.length === 0) {
         desc += `## 🎯 Behavioral Patterns\n\n`;
@@ -423,40 +400,34 @@ export class PromptGenerator {
   private identifyPatterns(analysis: AnalysisResult): string[] {
     const patterns: string[] = [];
 
-    // Check for modular scale
     if (analysis.typography.fontScale.modularScaleRatio) {
       patterns.push(
         `Uses modular typography scale (ratio: ${analysis.typography.fontScale.modularScaleRatio})`
       );
     }
 
-    // Check for consistent spacing
     if (analysis.spacing.baseUnit) {
       patterns.push(
         `Follows ${analysis.spacing.baseUnit}px spacing system (consistent multiples)`
       );
     }
 
-    // Check for design tokens (CSS variables)
     if (analysis.colors.cssVariables.length > 5) {
       patterns.push(
         `Uses CSS custom properties (design tokens) - ${analysis.colors.cssVariables.length} color variables`
       );
     }
 
-    // Check for semantic colors
     const { semantic } = analysis.colors;
     if (semantic.error && semantic.success) {
       patterns.push(`Implements semantic color system (success, error, warning, info)`);
     }
 
-    // Check for component variations
     const hasVariations = analysis.components.some(c => c.variations.length > 0);
     if (hasVariations) {
       patterns.push(`Components use size/variant variations (sm, md, lg, primary, secondary)`);
     }
 
-    // Check for interactive patterns
     if (analysis.interactions.themeSwitchers.length > 0) {
       patterns.push(
         `Implements theme switching (${analysis.interactions.themeSwitchers[0].mechanism})`
@@ -496,7 +467,6 @@ export class PromptGenerator {
       1.618: 'Golden Ratio'
     };
 
-    // Find closest match
     let closest = 1.125;
     let minDiff = Infinity;
 

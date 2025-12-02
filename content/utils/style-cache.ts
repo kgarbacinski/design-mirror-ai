@@ -12,9 +12,7 @@
  * - With cache: ~0.001ms per element (subsequent access)
  */
 
-// Properties we care about for design system analysis
 const RELEVANT_PROPERTIES = {
-  // Colors
   colors: [
     'color',
     'backgroundColor',
@@ -27,7 +25,6 @@ const RELEVANT_PROPERTIES = {
     'stroke'
   ],
 
-  // Typography
   typography: [
     'fontSize',
     'fontFamily',
@@ -40,7 +37,6 @@ const RELEVANT_PROPERTIES = {
     'textTransform'
   ],
 
-  // Spacing
   spacing: [
     'margin',
     'marginTop',
@@ -57,13 +53,11 @@ const RELEVANT_PROPERTIES = {
     'columnGap'
   ],
 
-  // Shadows
   shadows: [
     'boxShadow',
     'textShadow'
   ],
 
-  // Borders
   borders: [
     'border',
     'borderWidth',
@@ -79,7 +73,6 @@ const RELEVANT_PROPERTIES = {
     'borderBottomLeftRadius'
   ],
 
-  // Layout
   layout: [
     'display',
     'position',
@@ -98,7 +91,6 @@ const RELEVANT_PROPERTIES = {
     'gridTemplateRows'
   ],
 
-  // Visual
   visual: [
     'opacity',
     'visibility',
@@ -109,7 +101,6 @@ const RELEVANT_PROPERTIES = {
   ]
 };
 
-// Flatten all properties into a single array
 const ALL_RELEVANT_PROPERTIES = Object.values(RELEVANT_PROPERTIES).flat();
 
 export type StylePropertyCategory = keyof typeof RELEVANT_PROPERTIES;
@@ -137,7 +128,6 @@ export class StyleCache {
         cat => RELEVANT_PROPERTIES[cat]
       );
     } else {
-      // Default: all relevant properties
       this.propertiesToExtract = ALL_RELEVANT_PROPERTIES;
     }
   }
@@ -146,13 +136,11 @@ export class StyleCache {
    * Get computed styles for an element (cached)
    */
   getComputedStyles(element: Element): CachedStyles {
-    // Check cache first
     if (this.cache.has(element)) {
       this.hits++;
       return this.cache.get(element)!;
     }
 
-    // Cache miss - compute and store
     this.misses++;
     const styles = this.extractStyles(element);
     this.cache.set(element, styles);
@@ -198,7 +186,6 @@ export class StyleCache {
     const computed = window.getComputedStyle(element);
     const styles: CachedStyles = {};
 
-    // Extract only relevant properties for better performance
     for (const property of this.propertiesToExtract) {
       try {
         const value = computed.getPropertyValue(this.camelToKebab(property));
@@ -206,7 +193,6 @@ export class StyleCache {
           styles[property] = value;
         }
       } catch (error) {
-        // Some properties might not be available
         console.warn(`Failed to get property ${property}:`, error);
       }
     }
@@ -253,7 +239,6 @@ export class StyleCache {
         this.getComputedStyles(element);
       }
 
-      // Yield to browser occasionally
       if (elements.indexOf(element) % 100 === 0) {
         await new Promise(resolve => setTimeout(resolve, 0));
       }

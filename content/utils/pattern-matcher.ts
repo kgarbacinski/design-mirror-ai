@@ -22,12 +22,10 @@ export function analyzeFrequency<T>(
 ): FrequencyMap<T>[] {
   const frequencyMap = new Map<T, number>();
 
-  // Count occurrences
   for (const value of values) {
     frequencyMap.set(value, (frequencyMap.get(value) || 0) + 1);
   }
 
-  // Convert to array and filter
   const total = values.length;
   const results: FrequencyMap<T>[] = [];
 
@@ -41,7 +39,6 @@ export function analyzeFrequency<T>(
     }
   }
 
-  // Sort by count (descending)
   return results.sort((a, b) => b.count - a.count);
 }
 
@@ -131,7 +128,6 @@ export function detectBaseUnit(
     frequencies.set(candidate, score);
   }
 
-  // Find candidate with highest score
   let bestCandidate = null;
   let bestScore = 0;
 
@@ -142,7 +138,6 @@ export function detectBaseUnit(
     }
   }
 
-  // Require at least 50% of values to be divisible by base unit
   const threshold = values.length * 0.5;
   return bestScore >= threshold ? bestCandidate : null;
 }

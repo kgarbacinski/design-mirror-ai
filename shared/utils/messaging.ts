@@ -1,4 +1,3 @@
-// Chrome Extension Messaging Utilities
 
 import { Message, MessageResponse } from '../types/messages.types';
 

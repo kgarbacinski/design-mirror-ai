@@ -1,27 +1,21 @@
-// Message Types for Chrome Extension Communication
 
 import { AnalysisResult } from './design-system.types';
 
 export enum MessageType {
-  // Analysis
   START_ANALYSIS = 'START_ANALYSIS',
   ANALYSIS_PROGRESS = 'ANALYSIS_PROGRESS',
   ANALYSIS_COMPLETE = 'ANALYSIS_COMPLETE',
   ANALYSIS_ERROR = 'ANALYSIS_ERROR',
 
-  // Clipboard
   COPY_TO_CLIPBOARD = 'COPY_TO_CLIPBOARD',
 
-  // Export
   EXPORT_JSON = 'EXPORT_JSON',
 
-  // History
   GET_HISTORY = 'GET_HISTORY',
   SAVE_TO_HISTORY = 'SAVE_TO_HISTORY',
   CLEAR_HISTORY = 'CLEAR_HISTORY',
 }
 
-// Message Interfaces
 
 export interface StartAnalysisMessage {
   type: MessageType.START_ANALYSIS;
@@ -77,7 +71,6 @@ export type Message =
   | SaveToHistoryMessage
   | ClearHistoryMessage;
 
-// Response Types
 
 export interface SuccessResponse {
   success: true;

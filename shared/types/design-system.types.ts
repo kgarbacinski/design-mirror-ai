@@ -1,6 +1,4 @@
-// Design System Analysis Types
 
-// ===== Color System =====
 
 export interface RGB {
   r: number;
@@ -56,7 +54,6 @@ export interface ColorPalette {
   all: ColorCluster[];
 }
 
-// ===== Typography System =====
 
 export interface FontFamily {
   name: string;
@@ -99,7 +96,6 @@ export interface TypographySystem {
   lineHeights: string[];
 }
 
-// ===== Spacing System =====
 
 export interface SpacingInfo {
   value: number;
@@ -117,7 +113,6 @@ export interface SpacingSystem {
   allValues: Array<[number, SpacingInfo]>;
 }
 
-// ===== Shadow System =====
 
 export interface ShadowInfo {
   value: string;
@@ -131,7 +126,6 @@ export interface ShadowSystem {
   textShadows: ShadowInfo[];
 }
 
-// ===== Border System =====
 
 export interface BorderRadiusInfo {
   value: string;
@@ -144,7 +138,6 @@ export interface BorderSystem {
   styles: Array<{ value: string; count: number }>;
 }
 
-// ===== Component Detection =====
 
 export type ComponentType =
   | 'button'
@@ -213,7 +206,6 @@ export interface ComponentPattern {
   heuristics: Heuristic[];
 }
 
-// ===== Interactive Pattern System =====
 
 export type ThemeSwitcherMechanism =
   | 'class-toggle'
@@ -318,7 +310,6 @@ export interface JSAnimationPattern {
   hasComplexAnimations: boolean;
 }
 
-// ===== Behavioral Pattern System (NEW) =====
 
 export interface ModeSwitcherPattern {
   type: 'mode-switcher';
@@ -360,7 +351,6 @@ export interface InteractionPatternSystem {
   behavioral: BehavioralPattern; // NEW!
 }
 
-// ===== Complete Analysis Result =====
 
 export interface AnalysisResult {
   url: string;
@@ -376,7 +366,6 @@ export interface AnalysisResult {
   interactions: InteractionPatternSystem;
 }
 
-// ===== Generated Output =====
 
 export interface ComponentSnippet {
   type: string;
@@ -408,7 +397,6 @@ export interface GeneratedPrompt {
   combined: string;
 }
 
-// ===== History =====
 
 export interface AnalysisHistory {
   id: string;

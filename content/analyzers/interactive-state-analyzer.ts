@@ -16,12 +16,10 @@ export class InteractiveStateAnalyzer {
   public analyze(): InteractiveStatePattern[] {
     const patterns: Map<string, InteractiveStatePattern> = new Map();
 
-    // Iterate through all stylesheets
     this.parseStyleSheets(document.styleSheets, patterns);
 
     return Array.from(patterns.values())
       .filter(pattern => {
-        // Only include patterns that have at least one state
         return Object.keys(pattern.states).length > 0;
       })
       .slice(0, 50); // Limit to top 50 patterns
@@ -41,7 +39,6 @@ export class InteractiveStateAnalyzer {
 
         this.parseRules(sheet.cssRules, patterns);
       } catch (e) {
-        // CORS: External stylesheets might not be accessible
         console.warn('[InteractiveStateAnalyzer] Cannot access stylesheet:', e);
       }
     }
@@ -60,10 +57,8 @@ export class InteractiveStateAnalyzer {
       if (rule instanceof CSSStyleRule) {
         this.parseStyleRule(rule, patterns);
       } else if (rule instanceof CSSMediaRule) {
-        // Recursively parse media query rules
         this.parseRules(rule.cssRules, patterns);
       } else if (rule instanceof CSSSupportsRule) {
-        // Recursively parse @supports rules
         this.parseRules(rule.cssRules, patterns);
       }
     }
@@ -78,17 +73,14 @@ export class InteractiveStateAnalyzer {
   ): void {
     const selector = rule.selectorText;
 
-    // Check for interactive pseudo-classes
     const pseudoClassMatch = selector.match(/:(?:hover|focus|active|disabled)\b/);
     if (!pseudoClassMatch) return;
 
     const pseudoClass = pseudoClassMatch[0].slice(1); // Remove the ':'
 
-    // Extract base selector (remove pseudo-class)
     const baseSelector = selector.replace(/:(?:hover|focus|active|disabled)(\s|$|,|:)/g, '$1').trim();
     if (!baseSelector) return;
 
-    // Get or create pattern for this selector
     let pattern = patterns.get(baseSelector);
     if (!pattern) {
       pattern = {
@@ -100,7 +92,6 @@ export class InteractiveStateAnalyzer {
       patterns.set(baseSelector, pattern);
     }
 
-    // Extract styles for this pseudo-class
     const styles: Record<string, string> = {};
     const cssText = rule.style;
 
@@ -111,14 +102,12 @@ export class InteractiveStateAnalyzer {
       if (value) {
         styles[property] = value;
 
-        // Track changed properties
         if (!pattern.changedProperties.includes(property)) {
           pattern.changedProperties.push(property);
         }
       }
     }
 
-    // Assign styles to appropriate state
     if (Object.keys(styles).length > 0) {
       switch (pseudoClass) {
         case 'hover':
@@ -147,7 +136,6 @@ export class InteractiveStateAnalyzer {
     baseStyles?: Record<string, string>;
   } {
     try {
-      // Try to find actual element matching this selector
       const element = document.querySelector(selector);
       if (!element) return {};
 
@@ -158,11 +146,9 @@ export class InteractiveStateAnalyzer {
         baseStyles?: Record<string, string>;
       } = {};
 
-      // Determine element type
       const tagName = element.tagName.toLowerCase();
       context.elementType = tagName;
 
-      // Check for specific component types
       if (tagName === 'button' || element.getAttribute('role') === 'button') {
         context.elementType = 'button';
       } else if (tagName === 'a') {
@@ -173,19 +159,16 @@ export class InteractiveStateAnalyzer {
         context.elementType = `input-${element.getAttribute('type') || 'text'}`;
       }
 
-      // Get ARIA role if available
       const role = element.getAttribute('role') || element.getAttribute('aria-label');
       if (role) {
         context.role = role;
       }
 
-      // Extract text content (first few words)
       const text = element.textContent?.trim();
       if (text && text.length > 0) {
         context.textContent = text.substring(0, 50) + (text.length > 50 ? '...' : '');
       }
 
-      // Get base styles for comparison
       const computedStyle = window.getComputedStyle(element);
       context.baseStyles = {
         backgroundColor: computedStyle.backgroundColor,
@@ -196,7 +179,6 @@ export class InteractiveStateAnalyzer {
 
       return context;
     } catch (e) {
-      // Selector might not match any element
       return {};
     }
   }
@@ -227,7 +209,6 @@ export class InteractiveStateAnalyzer {
       parts.unshift(selector);
       current = current.parentElement;
 
-      // Limit depth
       if (parts.length >= 3) break;
     }
 

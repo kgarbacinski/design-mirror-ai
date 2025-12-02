@@ -32,7 +32,6 @@ export class CSSAnimationAnalyzer {
         continue;
       }
 
-      // Parse transition shorthand
       const transitions = this.parseTransitions(transition);
 
       for (const t of transitions) {
@@ -53,7 +52,6 @@ export class CSSAnimationAnalyzer {
 
         pattern.count++;
 
-        // Add example selector (limit to 3)
         if (pattern.examples.length < 3) {
           const selector = this.getSimpleSelector(element);
           if (!pattern.examples.includes(selector)) {
@@ -75,13 +73,10 @@ export class CSSAnimationAnalyzer {
     const animations: KeyframeAnimation[] = [];
     const animationUsage = new Map<string, string[]>(); // name -> selectors
 
-    // First pass: Extract @keyframes rules
     this.extractKeyframes(document.styleSheets, animations);
 
-    // Second pass: Find which selectors use these animations
     this.findAnimationUsage(document.styleSheets, animationUsage);
 
-    // Merge usage data
     for (const animation of animations) {
       animation.usedBy = animationUsage.get(animation.name) || [];
     }
@@ -96,7 +91,6 @@ export class CSSAnimationAnalyzer {
     const transitions = this.analyzeTransitions(elements, styleCache);
     const keyframeAnimations = this.analyzeKeyframes();
 
-    // Extract all animated properties
     const animatedProps = new Set<string>();
 
     for (const t of transitions) {
@@ -104,7 +98,6 @@ export class CSSAnimationAnalyzer {
     }
 
     for (const anim of keyframeAnimations) {
-      // Parse keyframes to extract properties (simplified)
       const props = this.extractPropertiesFromKeyframes(anim.keyframes);
       props.forEach(p => animatedProps.add(p));
     }
@@ -127,38 +120,32 @@ export class CSSAnimationAnalyzer {
     timingFunction: string;
     delay?: string;
   }> {
-    // Handle multiple transitions separated by comma
     const parts = transition.split(',').map(t => t.trim());
     const result = [];
 
     for (const part of parts) {
-      // Handle cubic-bezier and other functions properly
       let property = '';
       let duration = '';
       let timingFunction = 'ease';
       let delay = undefined;
 
-      // Match property and duration first
       const basicMatch = part.match(/^([\w-]+)\s+([\d.]+m?s)/);
       if (basicMatch) {
         property = basicMatch[1];
         duration = basicMatch[2];
 
-        // Extract timing function (might be cubic-bezier with commas)
         const remaining = part.substring(basicMatch[0].length).trim();
 
         if (remaining.startsWith('cubic-bezier(')) {
           const cubicMatch = remaining.match(/cubic-bezier\([^)]+\)/);
           if (cubicMatch) {
             timingFunction = cubicMatch[0];
-            // Check for delay after cubic-bezier
             const afterCubic = remaining.substring(cubicMatch[0].length).trim();
             if (afterCubic.match(/^\d+\.?\d*m?s/)) {
               delay = afterCubic.match(/^\d+\.?\d*m?s/)?.[0];
             }
           }
         } else if (remaining) {
-          // Simple timing function (ease, linear, etc.)
           const tokens = remaining.split(/\s+/);
           if (tokens[0]) timingFunction = tokens[0];
           if (tokens[1]) delay = tokens[1];
@@ -203,7 +190,6 @@ export class CSSAnimationAnalyzer {
           }
         }
       } catch (e) {
-        // CORS
         console.warn('[CSSAnimationAnalyzer] Cannot access stylesheet:', e);
       }
     }
@@ -223,7 +209,6 @@ export class CSSAnimationAnalyzer {
 
         this.scanRulesForAnimation(sheet.cssRules, usage);
       } catch (e) {
-        // CORS
       }
     }
   }
@@ -268,14 +253,11 @@ export class CSSAnimationAnalyzer {
   private extractPropertiesFromKeyframes(keyframesText: string): string[] {
     const props = new Set<string>();
 
-    // Simple regex to find CSS property names
-    // Matches things like "opacity:", "transform:", etc.
     const propRegex = /([a-z-]+)\s*:/gi;
     let match;
 
     while ((match = propRegex.exec(keyframesText)) !== null) {
       const prop = match[1].toLowerCase();
-      // Filter out animation properties themselves
       if (!prop.startsWith('animation-') && prop !== 'animation') {
         props.add(prop);
       }

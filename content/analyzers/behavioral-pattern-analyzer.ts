@@ -51,7 +51,6 @@ export class BehavioralPatternAnalyzer {
 
     const patterns: ModeSwitcherPattern[] = [];
 
-    // Strategy 1: Find buttons with mode-related semantics
     const buttons = this.findModeSwitchButtons();
 
     for (const button of buttons) {
@@ -61,7 +60,6 @@ export class BehavioralPatternAnalyzer {
       }
     }
 
-    // Strategy 2: CSS inference - scan stylesheets for mode classes
     const cssInferred = this.inferModesFromCSS();
     if (cssInferred) {
       patterns.push(cssInferred);
@@ -88,14 +86,12 @@ export class BehavioralPatternAnalyzer {
       const classes = button.className.toLowerCase();
       const ariaLabel = button.getAttribute('aria-label')?.toLowerCase() || '';
 
-      // Check if button has mode-related keywords
       const hasKeyword = modeKeywords.some(keyword =>
         text.includes(keyword) ||
         classes.includes(keyword) ||
         ariaLabel.includes(keyword)
       );
 
-      // Also check if in navigation context (higher confidence)
       const isInNav = button.closest('nav, header, [role="navigation"]') !== null;
 
       return hasKeyword && (isInNav || text.length < 20); // Short text = likely toggle
@@ -110,15 +106,12 @@ export class BehavioralPatternAnalyzer {
     const classes = button.className;
     const context = this.getElementContext(button);
 
-    // Extract semantic meaning from classes
     const semanticClues = this.extractSemanticClues(classes);
 
-    // Determine what modes are suggested
     const inferredModes = this.inferModesFromButton(button, semanticClues);
 
     if (inferredModes.length < 2) return null; // Need at least 2 modes
 
-    // Check current state
     const currentMode = this.detectCurrentMode(inferredModes);
 
     const evidence: string[] = [];
@@ -131,7 +124,6 @@ export class BehavioralPatternAnalyzer {
       evidence.push(`CSS classes suggest modes: ${semanticClues.join(', ')}`);
     }
 
-    // Check if mode classes exist in stylesheets
     const cssEvidence = this.checkStylesheetsForModes(inferredModes);
     if (cssEvidence) {
       evidence.push(cssEvidence);
@@ -190,7 +182,6 @@ export class BehavioralPatternAnalyzer {
 
     const text = button.textContent?.toLowerCase().trim() || '';
 
-    // Direct text matches
     const modeMap: Record<string, string[]> = {
       'dev': ['developer', 'founder'],
       'ceo': ['founder', 'developer'],
@@ -217,7 +208,6 @@ export class BehavioralPatternAnalyzer {
     const html = document.documentElement;
     const body = document.body;
 
-    // Check data-* attributes
     const dataTheme = html.getAttribute('data-theme') || body?.getAttribute('data-theme');
     const dataMode = html.getAttribute('data-mode') || body?.getAttribute('data-mode');
 
@@ -225,7 +215,6 @@ export class BehavioralPatternAnalyzer {
       return dataTheme || dataMode;
     }
 
-    // Check classes
     const allClasses = [
       ...Array.from(html.classList),
       ...(body ? Array.from(body.classList) : [])
@@ -271,7 +260,6 @@ export class BehavioralPatternAnalyzer {
             }
           }
         } catch (e) {
-          // CORS - skip external stylesheets
         }
       }
     } catch (e) {
@@ -307,7 +295,6 @@ export class BehavioralPatternAnalyzer {
             if (rule instanceof CSSStyleRule) {
               const selector = rule.selectorText;
 
-              // Look for mode-related class selectors
               const modeMatch = selector.match(/\.(dark|light|founder-mode|developer-mode|mode-\w+)/i);
               if (modeMatch && !modeClasses.includes(modeMatch[1])) {
                 modeClasses.push(modeMatch[1]);
@@ -315,7 +302,6 @@ export class BehavioralPatternAnalyzer {
             }
           }
         } catch (e) {
-          // CORS
         }
       }
     } catch (e) {
@@ -324,7 +310,6 @@ export class BehavioralPatternAnalyzer {
 
     if (modeClasses.length === 0) return null;
 
-    // Extract mode names
     const modes = modeClasses.map(cls => cls.replace(/-mode$/, '').replace(/^mode-/, ''));
 
     return {
@@ -388,7 +373,6 @@ export class BehavioralPatternAnalyzer {
 
     const patterns: TabGroupPattern[] = [];
 
-    // Find elements with role="tablist"
     const tabLists = Array.from(document.querySelectorAll('[role="tablist"]'));
 
     for (const tabList of tabLists) {
@@ -412,18 +396,15 @@ export class BehavioralPatternAnalyzer {
       }
     }
 
-    // Also find button groups that look like tabs (even without role="tablist")
     const buttonGroups = this.findButtonGroups();
 
     for (const group of buttonGroups) {
       if (group.length >= 2 && group.length <= 10) {
         const texts = group.map(btn => btn.textContent?.trim() || '');
 
-        // Check if they look like tabs (short text, similar styling)
         const avgLength = texts.reduce((sum, t) => sum + t.length, 0) / texts.length;
 
         if (avgLength < 20) {
-          // Short text = likely tabs
           const activeBtn = group.find(
             btn =>
               btn.classList.contains('active') ||
@@ -450,7 +431,6 @@ export class BehavioralPatternAnalyzer {
   private findButtonGroups(): Element[][] {
     const groups: Element[][] = [];
 
-    // Find all containers with multiple buttons
     const containers = Array.from(
       document.querySelectorAll('div, section, nav, aside, [role="group"]')
     );
@@ -484,7 +464,6 @@ export class BehavioralPatternAnalyzer {
     const footer = element.closest('footer, [role="contentinfo"]');
     if (footer) return 'Footer';
 
-    // Try to get parent section with meaningful class or id
     const section = element.closest('section, article, div[class*="section"]');
     if (section) {
       const sectionClass = section.className.split(/\s+/).find(cls => cls.length > 3);
@@ -524,15 +503,12 @@ export class BehavioralPatternAnalyzer {
   private calculateConfidence(evidence: string[], context: string): 'high' | 'medium' | 'low' {
     let score = 0;
 
-    // More evidence = higher confidence
     score += evidence.length * 20;
 
-    // Navigation context = higher confidence
     if (context === 'Navigation') {
       score += 30;
     }
 
-    // CSS evidence = good signal
     if (evidence.some(e => e.includes('stylesheet'))) {
       score += 20;
     }

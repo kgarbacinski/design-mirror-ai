@@ -23,7 +23,6 @@ const CopyButtons: React.FC<CopyButtonsProps> = ({ data }) => {
 
   const handleCopyJSON = async () => {
     try {
-      // Don't include prompt in JSON export
       const { prompt, ...result } = data;
       const json = JSON.stringify(result, null, 2);
       await navigator.clipboard.writeText(json);
@@ -35,7 +34,6 @@ const CopyButtons: React.FC<CopyButtonsProps> = ({ data }) => {
   };
 
   const handleDownloadJSON = () => {
-    // Don't include prompt in JSON export
     const { prompt, ...result } = data;
     const json = JSON.stringify(result, null, 2);
     const blob = new Blob([json], { type: 'application/json' });

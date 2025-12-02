@@ -17,7 +17,6 @@ export class BorderAnalyzer {
     for (const element of elements) {
       const borderStyles = styleCache.getByCategory(element, 'borders');
 
-      // Border radius
       if (borderStyles.borderRadius && borderStyles.borderRadius !== '0px') {
         radii.set(
           borderStyles.borderRadius,
@@ -25,13 +24,11 @@ export class BorderAnalyzer {
         );
       }
 
-      // Individual corner radii
       this.addBorderRadius(borderStyles.borderTopLeftRadius, radii);
       this.addBorderRadius(borderStyles.borderTopRightRadius, radii);
       this.addBorderRadius(borderStyles.borderBottomRightRadius, radii);
       this.addBorderRadius(borderStyles.borderBottomLeftRadius, radii);
 
-      // Border width
       if (borderStyles.borderWidth && borderStyles.borderWidth !== '0px') {
         widths.set(
           borderStyles.borderWidth,
@@ -39,7 +36,6 @@ export class BorderAnalyzer {
         );
       }
 
-      // Border style
       if (borderStyles.borderStyle && borderStyles.borderStyle !== 'none') {
         styles.set(
           borderStyles.borderStyle,

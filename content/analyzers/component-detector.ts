@@ -22,7 +22,6 @@ export class ComponentDetector {
     const seenElements = new WeakSet<Element>();
 
     for (const pattern of COMPONENT_PATTERNS) {
-      // Try each selector
       for (const selector of pattern.selectors) {
         try {
           const matches = document.querySelectorAll(selector);
@@ -30,7 +29,6 @@ export class ComponentDetector {
           for (const element of Array.from(matches)) {
             if (seenElements.has(element)) continue;
 
-            // Simple detection - just based on selector matching
             detected.push({
               type: pattern.type,
               element,
@@ -102,7 +100,6 @@ export class ComponentDetector {
     const variations: ComponentVariation[] = [];
     const className = element.className.toString().toLowerCase();
 
-    // Size variations
     const sizePatterns = ['xs', 'sm', 'small', 'md', 'medium', 'lg', 'large', 'xl'];
     for (const pattern of sizePatterns) {
       if (className.includes(pattern)) {
@@ -114,7 +111,6 @@ export class ComponentDetector {
       }
     }
 
-    // Variant variations
     const variantPatterns = ['primary', 'secondary', 'outline', 'ghost', 'link', 'text'];
     for (const pattern of variantPatterns) {
       if (className.includes(pattern)) {
@@ -126,7 +122,6 @@ export class ComponentDetector {
       }
     }
 
-    // Color variations
     const colorPatterns = ['red', 'blue', 'green', 'yellow', 'success', 'error', 'warning', 'info'];
     for (const pattern of colorPatterns) {
       if (className.includes(pattern)) {
@@ -138,7 +133,6 @@ export class ComponentDetector {
       }
     }
 
-    // State variations
     const statePatterns = ['active', 'disabled', 'loading', 'hover', 'focus'];
     for (const pattern of statePatterns) {
       if (className.includes(pattern)) {
