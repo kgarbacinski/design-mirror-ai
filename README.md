@@ -1,6 +1,6 @@
 # 🪞 DesignMirror
 
-> **See a website you love? Clone its entire design system in seconds.**
+> **See a website you love? Clone its entire design system in seconds. **
 
 [![Chrome Web Store](https://img.shields.io/badge/Chrome-Install-blue?style=for-the-badge&logo=google-chrome)](https://chrome.google.com/webstore)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
