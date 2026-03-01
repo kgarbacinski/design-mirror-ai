@@ -339,7 +339,6 @@ If DesignMirror helped you, please:
 
 ---
 
-<p align="center">Made with ❤️ by developers, for developers</p>
 <p align="center">
   <a href="https://github.com/yourusername/design-mirror/stargazers">⭐ Star us on GitHub</a>
 </p>
