@@ -11,7 +11,7 @@
   <img src="docs/assets/present-addon.gif" alt="DesignMirror Demo" width="800"/>
 </p>
 
-## ✨ What is DesignMirror?
+## What is DesignMirror?
 
 **Found a website with the perfect look?** DesignMirror lets you extract its complete design DNA - colors, typography, spacing, shadows, border radius, button styles, card layouts, animations, hover effects, transitions, and more - then generates AI-ready prompts so you can recreate that same professional aesthetic for your own project.
 
